@@ -1,0 +1,53 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: analeal
+      changes:
+        - sql:
+            sql: CREATE TYPE tipo_usuario AS ENUM ('CLIENTE', 'FUNCIONARIO', 'ADMIN');
+  - changeSet:
+      id: 2
+      author: analeal
+      changes:
+        - createTable:
+            tableName: usuario
+            columns:
+              - column:
+                  name: id
+                  type: serial
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: nome
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: senha
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tipo_usuario
+                  type: tipo_usuario
+                  constraints:
+                    nullable: false
+              - column:
+                  name: cpf
+                  type: varchar(14)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: telefone
+                  type: varchar(20)
+              - column:
+                  name: data_criacao
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
