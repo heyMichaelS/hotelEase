@@ -30,8 +30,8 @@ public class UsuarioController {
     }
 
     @PostMapping(value = "/criar-usuario", consumes = "application/json")
-    public ResponseEntity<Usuario> criarCliente(@RequestBody Usuario usuario) {
-        Usuario salvo = this.usuarioService.salvarUsuario(usuario);
+    public ResponseEntity<Usuario> criarCliente(@RequestBody UsuarioDTO usuarioDTO) {
+        Usuario salvo = this.usuarioService.salvarUsuario(usuarioDTO);
         return ResponseEntity.ok(salvo);
     }
 

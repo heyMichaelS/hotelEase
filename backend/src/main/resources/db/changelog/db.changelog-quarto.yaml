@@ -1,0 +1,40 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: analeal
+      changes:
+        - sql:
+            sql: CREATE TYPE status_quarto AS ENUM ('DISPONIVEL', 'OCUPADO', 'MANUTENCAO');
+
+  - changeSet:
+      id: 2
+      author: analeal
+      changes:
+        - createTable:
+            tableName: quartos
+            columns:
+              - column:
+                  name: id
+                  type: serial
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: numero
+                  type: int
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: tipo
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: preco_diaria
+                  type: decimal(10,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: status_quarto
+                  defaultValue: 'DISPONIVEL'

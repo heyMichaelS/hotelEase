@@ -20,7 +20,14 @@ public class UsuarioService {
     @Autowired
     private MensagemService mensagemService;
 
-    public Usuario salvarUsuario(Usuario usuario) {
+    public Usuario salvarUsuario(UsuarioDTO usuarioDTO) {
+        Usuario usuario = new Usuario();
+        usuario.setNome(usuarioDTO.nome());
+        usuario.setEmail(usuarioDTO.email());
+        usuario.setSenha(usuarioDTO.senha());
+        usuario.setTipoUsuario(usuarioDTO.tipoUsuario());
+        usuario.setCpf(usuarioDTO.cpf());
+        usuario.setTelefone(usuarioDTO.telefone());
         return this.usuarioRepository.save(usuario);
     }
 
@@ -45,6 +52,7 @@ public class UsuarioService {
                 .orElseThrow(() -> new EntityNotFoundException(mensagemService.getMensagem("usuario.nao.encontrado", id)));
 
         usuario.setNome(usuarioDTO.nome());
+        usuario.setEmail(usuarioDTO.email());
         usuario.setSenha(usuarioDTO.senha());
         usuario.setTipoUsuario(usuarioDTO.tipoUsuario());
         usuario.setCpf(usuarioDTO.cpf());
