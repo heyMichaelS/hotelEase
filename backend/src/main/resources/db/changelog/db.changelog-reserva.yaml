@@ -1,0 +1,75 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: michael
+      changes:
+        - sql:
+            sql: CREATE TYPE status_reserva AS ENUM ('ATIVA', 'FINALIZADA');
+
+  - changeSet:
+      id: 2
+      author: michael
+      changes:
+        - createTable:
+            tableName: reserva
+            columns:
+              - column:
+                  name: id
+                  type: serial
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: usuario_id
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: quarto_id
+                  type: int
+              - column:
+                  name: data_checkin
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: data_checkout
+                  type: timestamp
+              - column:
+                  name: status
+                  type: status_reserva
+                  defaultValue: 'ATIVA'
+              - column:
+                  name: criado_em
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: atualizado_em
+                  type: timestamp
+              - column:
+                  name: atualizado_por
+                  type: int
+
+        - addForeignKeyConstraint:
+            baseTableName: reserva
+            baseColumnNames: usuario_id
+            referencedTableName: usuario
+            referencedColumnNames: id
+            onDelete: CASCADE
+            constraintName: fk_reserva_usuario
+
+        - addForeignKeyConstraint:
+            baseTableName: reserva
+            baseColumnNames: quarto_id
+            referencedTableName: quarto
+            referencedColumnNames: id
+            onDelete: SET NULL
+            constraintName: fk_reserva_quarto
+
+        - addForeignKeyConstraint:
+            baseTableName: reserva
+            baseColumnNames: atualizado_por
+            referencedTableName: usuario
+            referencedColumnNames: id
+            constraintName: fk_reserva_atualizado_por
+
+        - sql:
+            sql: ALTER TABLE reserva ADD CONSTRAINT chk_datas_validas CHECK (data_checkout IS NULL OR data_checkout > data_checkin);

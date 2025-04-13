@@ -4,3 +4,6 @@ databaseChangeLog:
 
   - include:
       file: db/changelog/db.changelog-quarto.yaml
+
+  - include:
+      file: db/changelog/db.changelog-reserva.yaml

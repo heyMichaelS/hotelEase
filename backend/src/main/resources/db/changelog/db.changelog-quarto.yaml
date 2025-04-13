@@ -11,7 +11,7 @@ databaseChangeLog:
       author: analeal
       changes:
         - createTable:
-            tableName: quartos
+            tableName: quarto
             columns:
               - column:
                   name: id
