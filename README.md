@@ -1,5 +1,6 @@
 # Projeto-Hotel
 
+<img src="./documentation/Imagens/hotelesase.png" width="1050" height="600" alt="HotelEase">
 
 
 <p align="center"> 
@@ -10,7 +11,7 @@
             <img src="https://img.shields.io/badge/Banco%3A-Postgres-yellow"/>
       </a>
       <a>
-            <img src="https://img.shields.io/badge/Frontend %3A-React.JS-blue"/>
+            <img src="https://img.shields.io/badge/Frontend%3A-React.JS-blue"/>
       </a>
       <a>
             <img src="https://img.shields.io/badge/Framework%3A-SpringBoot-green"/>
@@ -20,12 +21,22 @@
       </a>
 </p>
 
+<hr>
+
+<p align="center">
+      <a href="#challenge">About the project</a> •
+      <a href="#schedule">Schedule</a> •
+      <a href="#team">Team</a> •
+      <a href="#utilized-tecnologies">Utilized Tecnologies</a>
+</p>
+
+# challenge
 
 Hotel – Sistema de Gestão de Comandas por Quarto
 Um sistema web para gestão de comandas vinculadas aos quartos de hóspedes em hotéis fazenda. A ideia é que o cliente faça check-in, receba um número de quarto, e todos os pedidos em restaurante, bar ou outros serviços sejam automaticamente vinculados a esse número.
 
 
-Tecnologias Utilizadas
+# utilized-tecnologies
 Back-end:
 
 * Java 17
@@ -94,8 +105,8 @@ Back-end (Spring Boot)
   ./mvnw spring-boot:run
   ```
 
-A API estará disponível em: http://localhost:8080
-Documentação Swagger: [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html#/)
+A API estará disponível em: http://localhost:8080 <br>
+Documentação Swagger: http://localhost:8080/swagger-ui/index.html#/  <br>
   
 Front-end (React + MUI)
 
