@@ -32,8 +32,14 @@
 
 # challenge
 
-Hotel – Sistema de Gestão de Comandas por Quarto
-Um sistema web para gestão de comandas vinculadas aos quartos de hóspedes em hotéis fazenda. A ideia é que o cliente faça check-in, receba um número de quarto, e todos os pedidos em restaurante, bar ou outros serviços sejam automaticamente vinculados a esse número.
+
+Este projeto nasceu da observação de um problema recorrente em hotéis: a dificuldade na gestão eficiente de comandas vinculadas aos quartos dos hóspedes. Como profissionais da área de tecnologia, buscamos constantemente maneiras de otimizar processos e aprimorar experiências.​
+
+Embora soluções semelhantes possam já existir, este projeto representa uma oportunidade de explorar novas tecnologias, implementar soluções personalizadas e, acima de tudo, aprender continuamente ao longo do desenvolvimento.​
+
+A seguir, você encontrará informações detalhadas sobre o andamento e as atualizações do projeto durante seu ciclo de desenvolvimento.​
+
+"A tecnologia move o mundo." — Steve Jobs​
 
 
 # utilized-tecnologies
