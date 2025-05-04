@@ -1,60 +1,86 @@
 import * as React from 'react';
-import { Avatar, Button, TextField, Link, Grid, Box, Typography, Container, CssBaseline, Paper, Divider, IconButton, InputAdornment } from '@mui/material';
+import {
+  Avatar, Button, TextField, Link, Grid, Box, Typography, Container,
+  CssBaseline, Paper, Divider, IconButton, InputAdornment
+} from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import GoogleIcon from '@mui/icons-material/Google';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { login } from '../../login_firebase';
+import { auth } from '../../firebase-config';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
 const theme = createTheme();
 
 export default function SignIn() {
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // Detecta se é mobile
-  const [showPassword, setShowPassword] = React.useState(false); // Estado para mostrar/ocultar a senha
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [showPassword, setShowPassword] = React.useState(false);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    const email = data.get('email');
+    const password = data.get('password');
+
+    try {
+      const usuario = await login(email, password);
+      console.log('Usuário autenticado:', usuario);
+      // Aqui você pode redirecionar ou armazenar os dados no contexto
+    } catch (error) {
+      console.error('Erro no login:', error.message);
+      // Exibir mensagem de erro para o usuário, se quiser
+    }
   };
 
-  const handleGoogleSignIn = () => {
-    console.log('Login com Google clicado');
+  const handleGoogleSignIn = async () => {
+    const provider = new GoogleAuthProvider();
+
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const token = await result.user.getIdToken();
+
+      const response = await fetch("http://localhost:8080/auth", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) throw new Error("Erro ao autenticar com o backend");
+
+      const usuario = await response.json();
+      console.log("Usuário autenticado com Google:", usuario);
+      // Redirecionar ou armazenar usuário
+    } catch (error) {
+      console.error("Erro no login com Google:", error.message);
+    }
   };
 
   const handleClickShowPassword = () => {
-    setShowPassword(!showPassword); // Alterna o estado de mostrar/ocultar senha
+    setShowPassword(!showPassword);
   };
 
   return (
     <ThemeProvider theme={theme}>
-      <Container
-        component="main"
-        maxWidth="sm"
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
+      <Container component="main" maxWidth="sm" sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
         <CssBaseline />
-        <Paper
-          elevation={6}
-          sx={{
-            padding: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            width: '100%',
-            maxWidth: 450,
-            borderRadius: 3,
-          }}
-        >
+        <Paper elevation={6} sx={{
+          padding: 4,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          width: '100%',
+          maxWidth: 450,
+          borderRadius: 3,
+        }}>
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
             <LockOutlinedIcon />
           </Avatar>
@@ -102,28 +128,20 @@ export default function SignIn() {
               fullWidth
               name="password"
               label="Senha"
-              type={showPassword ? 'text' : 'password'} // Altera o tipo com base no estado
+              type={showPassword ? 'text' : 'password'}
               id="password"
               autoComplete="current-password"
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton
-                      onClick={handleClickShowPassword} // Alterna o estado de mostrar/ocultar a senha
-                      edge="end"
-                    >
+                    <IconButton onClick={handleClickShowPassword} edge="end">
                       {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                     </IconButton>
                   </InputAdornment>
                 ),
               }}
             />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
+            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
               Entrar
             </Button>
 
