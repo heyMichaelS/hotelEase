@@ -7,10 +7,10 @@ import {
 } from '@mui/material';
 import {
   PersonAdd, Hotel, Logout, Receipt, Restaurant, RoomService,
-  Fastfood, Tablet, AddShoppingCart, CheckCircleOutline, Assignment, AccountCircle
+  Fastfood, AddShoppingCart, CheckCircleOutline, Assignment, AccountCircle
 } from '@mui/icons-material';
 import {
-  styled, alpha, useTheme, ThemeProvider, createTheme
+  styled, alpha, useTheme, ThemeProvider
 } from '@mui/material/styles';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
@@ -18,11 +18,11 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 import CadastroQuarto from '../CrudQuarto';
 import CadastroCliente from '../CrudCliente';
+import hotelTheme from '../../theme';
 
 const pageComponents = {
   "Cadastro de Quarto": <CadastroQuarto />,
   "Cadastro de Cliente": <CadastroCliente />,
-
 };
 
 const menuPorSetor = {
@@ -48,30 +48,6 @@ const menuPorSetor = {
     "Consumos Extras",
   ]
 };
-
-const hotelTheme = createTheme({
-  palette: {
-    mode: 'light',
-    primary: { main: '#0F172A' },
-    secondary: { main: '#10B981' },
-    background: { default: '#F9FAFB', paper: '#FFFFFF' },
-    text: { primary: '#111827', secondary: '#6B7280' },
-    error: { main: '#DC2626' },
-  },
-  shape: { borderRadius: 12 },
-  typography: {
-    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
-    button: { textTransform: 'none' },
-  },
-  components: {
-    MuiPaper: {
-      styleOverrides: { root: { borderRadius: 12 } },
-    },
-    MuiButton: {
-      styleOverrides: { root: { borderRadius: 12, fontWeight: 500 } },
-    },
-  },
-});
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',

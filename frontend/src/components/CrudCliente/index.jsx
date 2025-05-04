@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Container, TextField, Button, Table, TableBody, TableCell,
   TableHead, TableRow, Paper, Stack, FormControl,
@@ -7,8 +7,9 @@ import {
 } from '@mui/material';
 import { Edit, Delete, Visibility, VisibilityOff } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
+import api from '../../api';
 
-const CrudBasic = () => {
+const CrudUsuario = () => {
   const [items, setItems] = useState([]);
   const [formData, setFormData] = useState({
     nome: '',
@@ -18,10 +19,17 @@ const CrudBasic = () => {
     cpf: '',
     telefone: '',
   });
-  const [editingIndex, setEditingIndex] = useState(null);
+  const [editingId, setEditingId] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+
+  // Para controle de erros
+  const [errors, setErrors] = useState({
+    email: '',
+    telefone: '',
+    cpf: '',
+  });
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -29,6 +37,7 @@ const CrudBasic = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: '' }));  // Limpar erros ao alterar os dados
   };
 
   const toggleShowPassword = () => {
@@ -40,21 +49,148 @@ const CrudBasic = () => {
     setSnackbarOpen(true);
   };
 
-  const handleSubmit = () => {
-    const { nome, email, senha, cpf, telefone } = formData;
-    if (!nome.trim() || !email.trim() || !senha.trim() || !cpf.trim() || !telefone.trim()) return;
+  const loadUsuarios = async () => {
+    try {
+      const response = await api.get('/usuario/buscar-usuario');
+      if (Array.isArray(response.data)) {
+        setItems(response.data);
+      } else {
+        console.error('Dados de usuários não estão no formato esperado');
+        showSnackbar('Erro ao carregar usuários');
+      }
+    } catch (error) {
+      console.error('Erro ao carregar usuários', error);
+      showSnackbar('Erro ao carregar usuários');
+    }
+  };
 
-    if (editingIndex !== null) {
-      const updatedItems = [...items];
-      updatedItems[editingIndex] = formData;
-      setItems(updatedItems);
-      showSnackbar('Item atualizado com sucesso!');
-      setEditingIndex(null);
-    } else {
-      setItems((prev) => [...prev, formData]);
-      showSnackbar('Item adicionado com sucesso!');
+  useEffect(() => {
+    loadUsuarios();
+  }, []);
+
+  // Função para formatar telefone (já estava implementada)
+  const formatarTelefone = (value) => {
+    value = value.replace(/\D/g, '');
+    if (value.length > 11) value = value.slice(0, 11);
+    if (value.length === 11) {
+      return value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+    }
+    if (value.length <= 2) return `(${value}`;
+    if (value.length <= 7) return value.replace(/(\d{2})(\d{0,5})/, '($1) $2');
+    return value.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+  };
+
+  const handleTelefoneChange = (e) => {
+    let value = e.target.value;
+    value = formatarTelefone(value);
+    setFormData((prev) => ({ ...prev, telefone: value }));
+  };
+
+  // Função para formatar CPF
+  const formatarCPF = (value) => {
+    value = value.replace(/\D/g, '');
+    if (value.length > 11) value = value.slice(0, 11);
+    if (value.length <= 3) return value;
+    if (value.length <= 6) return value.replace(/(\d{3})(\d{0,3})/, '$1.$2');
+    if (value.length <= 9) return value.replace(/(\d{3})(\d{3})(\d{0,3})/, '$1.$2.$3');
+    return value.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/, '$1.$2.$3-$4');
+  };
+
+  const handleCpfChange = (e) => {
+    let value = e.target.value;
+    value = formatarCPF(value);
+    setFormData((prev) => ({ ...prev, cpf: value }));
+  };
+
+  const validateEmail = (email) => {
+    const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return re.test(email);
+  };
+
+  const validateCPF = (cpf) => {
+    const re = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
+    return re.test(cpf);
+  };
+
+  const validateForm = () => {
+    let isValid = true;
+    let validationErrors = {};
+
+    // Validar Email
+    if (!formData.email.trim()) {
+      validationErrors.email = 'O e-mail é obrigatório.';
+      isValid = false;
+    } else if (!validateEmail(formData.email)) {
+      validationErrors.email = 'O e-mail deve estar no formato correto.';
+      isValid = false;
     }
 
+    // Validar CPF
+    if (!formData.cpf.trim()) {
+      validationErrors.cpf = 'O CPF é obrigatório.';
+      isValid = false;
+    } else if (!validateCPF(formData.cpf)) {
+      validationErrors.cpf = 'O CPF deve estar no formato correto (xxx.xxx.xxx-xx).';
+      isValid = false;
+    }
+
+    // Validar Telefone
+    if (!formData.telefone.trim()) {
+      validationErrors.telefone = 'O telefone é obrigatório.';
+      isValid = false;
+    }
+
+    setErrors(validationErrors);
+    return isValid;
+  };
+
+  const handleSubmit = async () => {
+    const { nome, email, senha, cpf, telefone, tipoUsuario } = formData;
+
+    if (!nome.trim() || !email.trim() || !senha.trim() || !cpf.trim() || !telefone.trim()) {
+      showSnackbar('Todos os campos são obrigatórios.');
+      return;
+    }
+
+    if (!validateForm()) {
+      return;
+    }
+
+    try {
+      if (editingId !== null) {
+        await api.put(`/usuario/atualizar-usuario/${editingId}`, formData);
+        showSnackbar('Usuário atualizado com sucesso!');
+      } else {
+        await api.post('/usuario/criar-usuario', formData);
+        showSnackbar('Usuário adicionado com sucesso!');
+      }
+
+      await loadUsuarios();
+      resetForm();
+    } catch (error) {
+      console.error('Erro ao salvar usuário', error);
+      showSnackbar('Erro ao salvar usuário');
+    }
+  };
+
+  const handleEdit = (usuario) => {
+    setFormData(usuario);
+    setEditingId(usuario.id);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await api.delete(`/usuario/delete-usuario/${id}`);
+      showSnackbar('Usuário removido com sucesso!');
+      await loadUsuarios();
+      resetForm();
+    } catch (error) {
+      console.error('Erro ao deletar usuário', error);
+      showSnackbar('Erro ao deletar usuário');
+    }
+  };
+
+  const resetForm = () => {
     setFormData({
       nome: '',
       email: '',
@@ -63,30 +199,8 @@ const CrudBasic = () => {
       cpf: '',
       telefone: '',
     });
-  };
-
-  const handleEdit = (index) => {
-    setFormData(items[index]);
-    setEditingIndex(index);
-  };
-
-  const handleDelete = (index) => {
-    setItems((prev) => prev.filter((_, i) => i !== index));
-    if (editingIndex !== null) {
-      if (editingIndex === index) {
-        setEditingIndex(null);
-        setFormData({
-          nome: '',
-          email: '',
-          senha: '',
-          tipoUsuario: 'CLIENTE',
-          cpf: '',
-          telefone: '',
-        });
-      } else if (editingIndex > index) {
-        setEditingIndex((prev) => prev - 1);
-      }
-    }
+    setEditingId(null);
+    showSnackbar('Formulário limpo!');
   };
 
   return (
@@ -106,6 +220,8 @@ const CrudBasic = () => {
             value={formData.email}
             onChange={handleChange}
             fullWidth
+            error={!!errors.email}
+            helperText={errors.email}
           />
           <TextField
             label="Senha"
@@ -114,15 +230,14 @@ const CrudBasic = () => {
             value={formData.senha}
             onChange={handleChange}
             fullWidth
+            error={!!errors.senha}
+            helperText={errors.senha}
             InputProps={{
               endAdornment: (
-                <IconButton
-                  onClick={toggleShowPassword}
-                  edge="end"
-                >
+                <IconButton onClick={toggleShowPassword} edge="end">
                   {showPassword ? <VisibilityOff /> : <Visibility />}
                 </IconButton>
-              )
+              ),
             }}
           />
           <FormControl fullWidth>
@@ -142,19 +257,28 @@ const CrudBasic = () => {
             label="CPF"
             name="cpf"
             value={formData.cpf}
-            onChange={handleChange}
+            onChange={handleCpfChange}
             fullWidth
+            error={!!errors.cpf}
+            helperText={errors.cpf}
           />
           <TextField
             label="Telefone"
             name="telefone"
             value={formData.telefone}
-            onChange={handleChange}
+            onChange={handleTelefoneChange}
             fullWidth
+            error={!!errors.telefone}
+            helperText={errors.telefone}
           />
-          <Button variant="contained" size={isMobile ? "small" : "medium"} onClick={handleSubmit}>
-            {editingIndex !== null ? 'Atualizar' : 'Adicionar'}
-          </Button>
+          <Stack direction="row" spacing={2}>
+            <Button variant="contained" size={isMobile ? 'small' : 'medium'} onClick={handleSubmit}>
+              {editingId !== null ? 'Atualizar' : 'Adicionar'}
+            </Button>
+            <Button variant="outlined" size={isMobile ? 'small' : 'medium'} onClick={resetForm}>
+              Limpar
+            </Button>
+          </Stack>
         </Stack>
       </Paper>
 
@@ -173,26 +297,34 @@ const CrudBasic = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {items.map((item, index) => (
-                <TableRow key={index}>
-                  <TableCell>{item.nome}</TableCell>
-                  <TableCell>{item.email}</TableCell>
-                  <TableCell>{item.senha}</TableCell>
-                  <TableCell>{item.tipoUsuario}</TableCell>
-                  <TableCell>{item.cpf}</TableCell>
-                  <TableCell>{item.telefone}</TableCell>
-                  <TableCell align="right">
-                    <Stack direction="row" spacing={1} justifyContent="flex-end">
-                      <IconButton onClick={() => handleEdit(index)} color="primary">
-                        <Edit />
-                      </IconButton>
-                      <IconButton onClick={() => handleDelete(index)} color="error">
-                        <Delete />
-                      </IconButton>
-                    </Stack>
+              {items.length > 0 ? (
+                items.map((usuario) => (
+                  <TableRow key={usuario.id}>
+                    <TableCell>{usuario.nome}</TableCell>
+                    <TableCell>{usuario.email}</TableCell>
+                    <TableCell>{usuario.senha}</TableCell>
+                    <TableCell>{usuario.tipoUsuario}</TableCell>
+                    <TableCell>{usuario.cpf}</TableCell>
+                    <TableCell>{usuario.telefone}</TableCell>
+                    <TableCell align="right">
+                      <Stack direction="row" spacing={1} justifyContent="flex-end">
+                        <IconButton onClick={() => handleEdit(usuario)} color="primary">
+                          <Edit />
+                        </IconButton>
+                        <IconButton onClick={() => handleDelete(usuario.id)} color="error">
+                          <Delete />
+                        </IconButton>
+                      </Stack>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={7} align="center">
+                    Nenhum usuário encontrado
                   </TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </Box>
@@ -202,9 +334,8 @@ const CrudBasic = () => {
         open={snackbarOpen}
         autoHideDuration={3000}
         onClose={() => setSnackbarOpen(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert onClose={() => setSnackbarOpen(false)} severity="success" sx={{ width: '100%' }}>
+        <Alert onClose={() => setSnackbarOpen(false)} severity="success">
           {snackbarMessage}
         </Alert>
       </Snackbar>
@@ -212,4 +343,4 @@ const CrudBasic = () => {
   );
 };
 
-export default CrudBasic;
+export default CrudUsuario;
