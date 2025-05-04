@@ -1,15 +1,11 @@
-import React, { useState } from 'react';
-import {
-  Container, TextField, Button, Table, TableBody, TableCell,
-  TableHead, TableRow, Paper, Stack, FormControl,
-  InputLabel, Select, MenuItem, IconButton, Box,
-  Snackbar, Alert, useMediaQuery
-} from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Container, TextField, Button, Table, TableBody, TableCell, TableHead, TableRow, Paper, Stack, FormControl, InputLabel, Select, MenuItem, IconButton, Box, Snackbar, Alert, useMediaQuery } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import { NumericFormat } from 'react-number-format';
+import api from '../../api';
 
-const CrudBasic = () => {
+const CrudQuarto = () => {
   const [items, setItems] = useState([]);
   const [formData, setFormData] = useState({
     numero: '',
@@ -17,7 +13,7 @@ const CrudBasic = () => {
     precoDiaria: '',
     status: 'DISPONIVEL',
   });
-  const [editingIndex, setEditingIndex] = useState(null);
+  const [editingId, setEditingId] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
@@ -34,39 +30,69 @@ const CrudBasic = () => {
     setSnackbarOpen(true);
   };
 
-  const handleSubmit = () => {
-    const { numero, tipo, precoDiaria } = formData;
-    if (!numero.trim() || !tipo.trim() || !precoDiaria.trim()) return;
-
-    if (editingIndex !== null) {
-      const updatedItems = [...items];
-      updatedItems[editingIndex] = formData;
-      setItems(updatedItems);
-      showSnackbar('Item atualizado com sucesso!');
-      setEditingIndex(null);
-    } else {
-      setItems((prev) => [...prev, formData]);
-      showSnackbar('Item adicionado com sucesso!');
+  const loadQuartos = async () => {
+    try {
+      const response = await api.get('quarto/buscar-quarto');
+      setItems(response.data);
+    } catch (error) {
+      console.error('Erro ao carregar quartos', error);
+      showSnackbar('Erro ao carregar quartos');
     }
-
-    setFormData({ numero: '', tipo: '', precoDiaria: '', status: 'DISPONIVEL' });
   };
 
-  const handleEdit = (index) => {
-    setFormData(items[index]);
-    setEditingIndex(index);
-  };
+  useEffect(() => {
+    loadQuartos();
+  }, []);
 
-  const handleDelete = (index) => {
-    setItems((prev) => prev.filter((_, i) => i !== index));
-    if (editingIndex !== null) {
-      if (editingIndex === index) {
-        setEditingIndex(null);
-        setFormData({ numero: '', tipo: '', precoDiaria: '', status: 'DISPONIVEL' });
-      } else if (editingIndex > index) {
-        setEditingIndex((prev) => prev - 1);
+  const handleSubmit = async () => {
+    const { numero, tipo, precoDiaria, status } = formData;
+  
+    if (!String(numero).trim() || !String(tipo).trim() || !String(precoDiaria).trim()) {
+      showSnackbar('Por favor, preencha todos os campos corretamente.');
+      return;
+    }
+  
+    try {
+      if (editingId !== null) {
+        await api.put(`quarto/atualizar-quarto/${editingId}`, formData);
+        showSnackbar('Quarto atualizado com sucesso!');
+      } else {
+        await api.post('quarto/criar-quarto', formData);
+        showSnackbar('Quarto adicionado com sucesso!');
       }
+      await loadQuartos();
+      resetForm();
+    } catch (error) {
+      console.error('Erro ao salvar quarto', error);
+      showSnackbar('Erro ao salvar quarto');
     }
+  };
+  
+  const handleEdit = (quarto) => {
+    setFormData(quarto);
+    setEditingId(quarto.id);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await api.delete(`quarto/delete-quarto/${id}`);
+      showSnackbar('Quarto removido com sucesso!');
+      await loadQuartos();
+      resetForm();
+    } catch (error) {
+      console.error('Erro ao deletar quarto', error);
+      showSnackbar('Erro ao deletar quarto');
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      numero: '',
+      tipo: '',
+      precoDiaria: '',
+      status: 'DISPONIVEL',
+    });
+    setEditingId(null);
   };
 
   return (
@@ -114,9 +140,14 @@ const CrudBasic = () => {
               <MenuItem value="MANUTENCAO">Manutenção</MenuItem>
             </Select>
           </FormControl>
-          <Button variant="contained" size={isMobile ? "small" : "medium"} onClick={handleSubmit}>
-            {editingIndex !== null ? 'Atualizar' : 'Adicionar'}
-          </Button>
+          <Stack direction="row" spacing={2}>
+            <Button variant="contained" size={isMobile ? 'small' : 'medium'} onClick={handleSubmit}>
+              {editingId !== null ? 'Atualizar' : 'Adicionar'}
+            </Button>
+            <Button variant="outlined" size={isMobile ? 'small' : 'medium'} onClick={resetForm}>
+              Limpar
+            </Button>
+          </Stack>
         </Stack>
       </Paper>
 
@@ -133,18 +164,18 @@ const CrudBasic = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {items.map((item, index) => (
-                <TableRow key={index}>
-                  <TableCell>{item.numero}</TableCell>
-                  <TableCell>{item.tipo}</TableCell>
-                  <TableCell>R$ {Number(item.precoDiaria).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
-                  <TableCell>{item.status}</TableCell>
+              {items.map((quarto) => (
+                <TableRow key={quarto.id}>
+                  <TableCell>{quarto.numero}</TableCell>
+                  <TableCell>{quarto.tipo}</TableCell>
+                  <TableCell>R$ {Number(quarto.precoDiaria).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
+                  <TableCell>{quarto.status}</TableCell>
                   <TableCell align="right">
                     <Stack direction="row" spacing={1} justifyContent="flex-end">
-                      <IconButton onClick={() => handleEdit(index)} color="primary">
+                      <IconButton onClick={() => handleEdit(quarto)} color="primary">
                         <Edit />
                       </IconButton>
-                      <IconButton onClick={() => handleDelete(index)} color="error">
+                      <IconButton onClick={() => handleDelete(quarto.id)} color="error">
                         <Delete />
                       </IconButton>
                     </Stack>
@@ -170,4 +201,4 @@ const CrudBasic = () => {
   );
 };
 
-export default CrudBasic;
+export default CrudQuarto;
