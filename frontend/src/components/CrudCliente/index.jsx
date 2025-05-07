@@ -1,43 +1,58 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
-  Container, TextField, Button, Table, TableBody, TableCell,
-  TableHead, TableRow, Paper, Stack, FormControl,
-  InputLabel, Select, MenuItem, IconButton, Box,
-  Snackbar, Alert, useMediaQuery
-} from '@mui/material';
-import { Edit, Delete, Visibility, VisibilityOff } from '@mui/icons-material';
-import { useTheme } from '@mui/material/styles';
-import api from '../../api';
+  Container,
+  TextField,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Paper,
+  Stack,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  IconButton,
+  Box,
+  Snackbar,
+  Alert,
+  useMediaQuery,
+} from "@mui/material";
+import { Edit, Delete, Visibility, VisibilityOff } from "@mui/icons-material";
+import { useTheme } from "@mui/material/styles";
+import api from "../../api";
 
 const CrudUsuario = () => {
   const [items, setItems] = useState([]);
   const [formData, setFormData] = useState({
-    nome: '',
-    email: '',
-    senha: '',
-    tipoUsuario: 'CLIENTE',
-    cpf: '',
-    telefone: '',
+    nome: "",
+    email: "",
+    senha: "",
+    tipoUsuario: "CLIENTE",
+    cpf: "",
+    telefone: "",
   });
   const [editingId, setEditingId] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarMessage, setSnackbarMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  // Para controle de erros
   const [errors, setErrors] = useState({
-    email: '',
-    telefone: '',
-    cpf: '',
+    email: "",
+    telefone: "",
+    cpf: "",
+    senha: "",
   });
 
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setErrors((prev) => ({ ...prev, [name]: '' }));  // Limpar erros ao alterar os dados
+    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
   const toggleShowPassword = () => {
@@ -51,16 +66,14 @@ const CrudUsuario = () => {
 
   const loadUsuarios = async () => {
     try {
-      const response = await api.get('/usuario/buscar-usuario');
+      const response = await api.get("/usuario/buscar-usuario");
       if (Array.isArray(response.data)) {
         setItems(response.data);
       } else {
-        console.error('Dados de usuários não estão no formato esperado');
-        showSnackbar('Erro ao carregar usuários');
+        showSnackbar("Erro ao carregar usuários");
       }
     } catch (error) {
-      console.error('Erro ao carregar usuários', error);
-      showSnackbar('Erro ao carregar usuários');
+      showSnackbar("Erro ao carregar usuários");
     }
   };
 
@@ -68,16 +81,15 @@ const CrudUsuario = () => {
     loadUsuarios();
   }, []);
 
-  // Função para formatar telefone (já estava implementada)
   const formatarTelefone = (value) => {
-    value = value.replace(/\D/g, '');
+    value = value.replace(/\D/g, "");
     if (value.length > 11) value = value.slice(0, 11);
     if (value.length === 11) {
-      return value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+      return value.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
     }
     if (value.length <= 2) return `(${value}`;
-    if (value.length <= 7) return value.replace(/(\d{2})(\d{0,5})/, '($1) $2');
-    return value.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+    if (value.length <= 7) return value.replace(/(\d{2})(\d{0,5})/, "($1) $2");
+    return value.replace(/(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3");
   };
 
   const handleTelefoneChange = (e) => {
@@ -86,14 +98,14 @@ const CrudUsuario = () => {
     setFormData((prev) => ({ ...prev, telefone: value }));
   };
 
-  // Função para formatar CPF
   const formatarCPF = (value) => {
-    value = value.replace(/\D/g, '');
+    value = value.replace(/\D/g, "");
     if (value.length > 11) value = value.slice(0, 11);
     if (value.length <= 3) return value;
-    if (value.length <= 6) return value.replace(/(\d{3})(\d{0,3})/, '$1.$2');
-    if (value.length <= 9) return value.replace(/(\d{3})(\d{3})(\d{0,3})/, '$1.$2.$3');
-    return value.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/, '$1.$2.$3-$4');
+    if (value.length <= 6) return value.replace(/(\d{3})(\d{0,3})/, "$1.$2");
+    if (value.length <= 9)
+      return value.replace(/(\d{3})(\d{3})(\d{0,3})/, "$1.$2.$3");
+    return value.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/, "$1.$2.$3-$4");
   };
 
   const handleCpfChange = (e) => {
@@ -112,31 +124,43 @@ const CrudUsuario = () => {
     return re.test(cpf);
   };
 
+  const validateSenha = (senha) => {
+    const re = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
+    return re.test(senha);
+  };
+
   const validateForm = () => {
     let isValid = true;
     let validationErrors = {};
 
-    // Validar Email
     if (!formData.email.trim()) {
-      validationErrors.email = 'O e-mail é obrigatório.';
+      validationErrors.email = "O e-mail é obrigatório.";
       isValid = false;
     } else if (!validateEmail(formData.email)) {
-      validationErrors.email = 'O e-mail deve estar no formato correto.';
+      validationErrors.email = "O e-mail deve estar no formato correto.";
       isValid = false;
     }
 
-    // Validar CPF
+    if (!formData.senha.trim()) {
+      validationErrors.senha = "A senha é obrigatória.";
+      isValid = false;
+    } else if (!validateSenha(formData.senha)) {
+      validationErrors.senha =
+        "A senha deve ter no mínimo 6 caracteres, com letras e números.";
+      isValid = false;
+    }
+
     if (!formData.cpf.trim()) {
-      validationErrors.cpf = 'O CPF é obrigatório.';
+      validationErrors.cpf = "O CPF é obrigatório.";
       isValid = false;
     } else if (!validateCPF(formData.cpf)) {
-      validationErrors.cpf = 'O CPF deve estar no formato correto (xxx.xxx.xxx-xx).';
+      validationErrors.cpf =
+        "O CPF deve estar no formato correto (xxx.xxx.xxx-xx).";
       isValid = false;
     }
 
-    // Validar Telefone
     if (!formData.telefone.trim()) {
-      validationErrors.telefone = 'O telefone é obrigatório.';
+      validationErrors.telefone = "O telefone é obrigatório.";
       isValid = false;
     }
 
@@ -147,8 +171,14 @@ const CrudUsuario = () => {
   const handleSubmit = async () => {
     const { nome, email, senha, cpf, telefone, tipoUsuario } = formData;
 
-    if (!nome.trim() || !email.trim() || !senha.trim() || !cpf.trim() || !telefone.trim()) {
-      showSnackbar('Todos os campos são obrigatórios.');
+    if (
+      !nome.trim() ||
+      !email.trim() ||
+      !senha.trim() ||
+      !cpf.trim() ||
+      !telefone.trim()
+    ) {
+      showSnackbar("Todos os campos são obrigatórios.");
       return;
     }
 
@@ -159,17 +189,16 @@ const CrudUsuario = () => {
     try {
       if (editingId !== null) {
         await api.put(`/usuario/atualizar-usuario/${editingId}`, formData);
-        showSnackbar('Usuário atualizado com sucesso!');
+        showSnackbar("Usuário atualizado com sucesso!");
       } else {
-        await api.post('/usuario/criar-usuario', formData);
-        showSnackbar('Usuário adicionado com sucesso!');
+        await api.post("/usuario/criar-usuario", formData);
+        showSnackbar("Usuário adicionado com sucesso!");
       }
 
       await loadUsuarios();
       resetForm();
     } catch (error) {
-      console.error('Erro ao salvar usuário', error);
-      showSnackbar('Erro ao salvar usuário');
+      showSnackbar("Erro ao salvar usuário");
     }
   };
 
@@ -181,26 +210,25 @@ const CrudUsuario = () => {
   const handleDelete = async (id) => {
     try {
       await api.delete(`/usuario/delete-usuario/${id}`);
-      showSnackbar('Usuário removido com sucesso!');
+      showSnackbar("Usuário removido com sucesso!");
       await loadUsuarios();
       resetForm();
     } catch (error) {
-      console.error('Erro ao deletar usuário', error);
-      showSnackbar('Erro ao deletar usuário');
+      showSnackbar("Erro ao deletar usuário");
     }
   };
 
   const resetForm = () => {
     setFormData({
-      nome: '',
-      email: '',
-      senha: '',
-      tipoUsuario: 'CLIENTE',
-      cpf: '',
-      telefone: '',
+      nome: "",
+      email: "",
+      senha: "",
+      tipoUsuario: "CLIENTE",
+      cpf: "",
+      telefone: "",
     });
     setEditingId(null);
-    showSnackbar('Formulário limpo!');
+    showSnackbar("Formulário limpo!");
   };
 
   return (
@@ -211,7 +239,13 @@ const CrudUsuario = () => {
             label="Nome"
             name="nome"
             value={formData.nome}
-            onChange={handleChange}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (/^[A-Za-zÀ-ÿ\s]*$/.test(value)) {
+                setFormData((prev) => ({ ...prev, nome: value }));
+              }
+            }}
+            inputProps={{ inputMode: "text" }}
             fullWidth
           />
           <TextField
@@ -226,7 +260,7 @@ const CrudUsuario = () => {
           <TextField
             label="Senha"
             name="senha"
-            type={showPassword ? 'text' : 'password'}
+            type={showPassword ? "text" : "password"}
             value={formData.senha}
             onChange={handleChange}
             fullWidth
@@ -272,10 +306,18 @@ const CrudUsuario = () => {
             helperText={errors.telefone}
           />
           <Stack direction="row" spacing={2}>
-            <Button variant="contained" size={isMobile ? 'small' : 'medium'} onClick={handleSubmit}>
-              {editingId !== null ? 'Atualizar' : 'Adicionar'}
+            <Button
+              variant="contained"
+              size={isMobile ? "small" : "medium"}
+              onClick={handleSubmit}
+            >
+              {editingId !== null ? "Atualizar" : "Adicionar"}
             </Button>
-            <Button variant="outlined" size={isMobile ? 'small' : 'medium'} onClick={resetForm}>
+            <Button
+              variant="outlined"
+              size={isMobile ? "small" : "medium"}
+              onClick={resetForm}
+            >
               Limpar
             </Button>
           </Stack>
@@ -283,7 +325,7 @@ const CrudUsuario = () => {
       </Paper>
 
       <Paper sx={{ mt: 4 }}>
-        <Box sx={{ overflowX: 'auto' }}>
+        <Box sx={{ overflowX: "auto" }}>
           <Table>
             <TableHead>
               <TableRow>
@@ -307,11 +349,21 @@ const CrudUsuario = () => {
                     <TableCell>{usuario.cpf}</TableCell>
                     <TableCell>{usuario.telefone}</TableCell>
                     <TableCell align="right">
-                      <Stack direction="row" spacing={1} justifyContent="flex-end">
-                        <IconButton onClick={() => handleEdit(usuario)} color="primary">
+                      <Stack
+                        direction="row"
+                        spacing={1}
+                        justifyContent="flex-end"
+                      >
+                        <IconButton
+                          onClick={() => handleEdit(usuario)}
+                          color="primary"
+                        >
                           <Edit />
                         </IconButton>
-                        <IconButton onClick={() => handleDelete(usuario.id)} color="error">
+                        <IconButton
+                          onClick={() => handleDelete(usuario.id)}
+                          color="error"
+                        >
                           <Delete />
                         </IconButton>
                       </Stack>
