@@ -42,12 +42,14 @@ export default function SignIn() {
       const result = await signInWithPopup(auth, provider);
       const token = await result.user.getIdToken();
 
-      const response = await fetch("http://localhost:8080/auth", {
+      const response = await fetch("http://localhost:8080/usuario/auth", {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
+
+      console.log("teste", token);
 
       if (!response.ok) throw new Error("Erro ao autenticar com o backend");
 

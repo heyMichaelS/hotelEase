@@ -115,4 +115,5 @@ public class Usuario {
     public void setTelefone(@Pattern(regexp = "\\(?\\d{2}\\)?\\s?9?\\d{4}-\\d{4}", message = "cliente.telefone") String telefone) {
         this.telefone = telefone;
     }
+
 }

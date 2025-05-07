@@ -1,10 +1,12 @@
 package com.br.hotelEase.controller;
 
 import com.br.hotelEase.DTO.UsuarioDTO;
+import com.br.hotelEase.DTO.UsuarioDetailsDTO;
 import com.br.hotelEase.entity.Usuario;
 import com.br.hotelEase.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -47,4 +49,12 @@ public class UsuarioController {
         Usuario atualizado = this.usuarioService.atualizarUsuario(usuarioDTO, id);
         return ResponseEntity.ok(atualizado);
     }
+
+    @GetMapping("/auth")
+    public ResponseEntity<Usuario> getUsuarioLogado() {
+        UsuarioDetailsDTO usuarioDetails = (UsuarioDetailsDTO) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Usuario usuario = usuarioDetails.getUsuario();
+        return ResponseEntity.ok(usuario);
+    }
+
 }
