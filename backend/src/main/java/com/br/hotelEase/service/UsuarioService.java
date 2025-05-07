@@ -60,4 +60,12 @@ public class UsuarioService {
 
         return this.usuarioRepository.save(usuario);
     }
+
+    public Usuario buscarPorEmail(String email) {
+        return usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        mensagemService.getMensagem("email.nao.encontrado", email)
+                ));
+    }
+
 }
