@@ -1,8 +1,11 @@
 package com.br.hotelEase.security;
 
+import com.br.hotelEase.DTO.UsuarioDTO;
 import com.br.hotelEase.DTO.UsuarioDetailsDTO;
 import com.br.hotelEase.entity.Usuario;
+import com.br.hotelEase.enuns.TipoUsuario;
 import com.br.hotelEase.service.UsuarioService;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseToken;
 import jakarta.servlet.FilterChain;
@@ -22,8 +25,14 @@ import java.io.IOException;
 @Component
 public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
 
+    private final FirebaseApp firebaseApp;
+    private final UsuarioService usuarioService;
+
     @Autowired
-    private UsuarioService usuarioService;
+    public FirebaseAuthenticationFilter(FirebaseApp firebaseApp, UsuarioService usuarioService) {
+        this.firebaseApp = firebaseApp;
+        this.usuarioService = usuarioService;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -31,39 +40,51 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
 
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
-            response.setStatus(HttpServletResponse.SC_OK);
+            filterChain.doFilter(request, response);
             return;
         }
 
         try {
             String token = parseToken(request);
+
             if (token != null) {
-                FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
+                FirebaseToken decodedToken = FirebaseAuth.getInstance(firebaseApp).verifyIdToken(token);
                 String email = decodedToken.getEmail();
+                String nome = decodedToken.getName();
 
                 if (email != null) {
-                    Usuario usuario = usuarioService.buscarPorEmail(email);
-                    if (usuario != null) {
-                        UsuarioDetailsDTO usuarioDetails = new UsuarioDetailsDTO(usuario);
-                        UsernamePasswordAuthenticationToken authentication =
-                                new UsernamePasswordAuthenticationToken(usuarioDetails, null, usuarioDetails.getAuthorities());
-                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    Usuario usuario;
+                    try {
+                        usuario = usuarioService.buscarPorEmail(email);
+                    } catch (Exception e) {
+                        usuario = usuarioService.salvarUsuario(new UsuarioDTO(
+                                nome,
+                                email,
+                                null,
+                                TipoUsuario.CLIENTE,
+                                null,
+                                null
+                        ));
                     }
+
+                    UsuarioDetailsDTO usuarioDetails = new UsuarioDetailsDTO(usuario);
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(usuarioDetails, null, usuarioDetails.getAuthorities());
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido ou expirado: " + e.getMessage());
+            return;
         }
 
         filterChain.doFilter(request, response);
     }
 
     private String parseToken(HttpServletRequest request) {
-        String headerAuth = request.getHeader("Authorization");
-        if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
-            return headerAuth.substring(7);
-        }
-        return null;
+        String header = request.getHeader("Authorization");
+        return (StringUtils.hasText(header) && header.startsWith("Bearer ")) ? header.substring(7) : null;
     }
 }

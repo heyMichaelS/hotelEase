@@ -51,10 +51,10 @@ public class UsuarioController {
     }
 
     @GetMapping("/auth")
-    public ResponseEntity<Usuario> getUsuarioLogado() {
-        UsuarioDetailsDTO usuarioDetails = (UsuarioDetailsDTO) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Usuario usuario = usuarioDetails.getUsuario();
-        return ResponseEntity.ok(usuario);
+    public ResponseEntity<UsuarioDetailsDTO> getUsuarioLogado() {
+        UsuarioDetailsDTO usuarioDetails = (UsuarioDetailsDTO) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
+        return ResponseEntity.ok(usuarioDetails);
     }
-
 }

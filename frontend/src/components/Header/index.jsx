@@ -1,28 +1,50 @@
-import * as React from 'react';
+import * as React from "react";
 import {
-  AppBar, Box, Toolbar, Typography, InputBase, IconButton,
-  Avatar, Button, Divider, Menu as MuiMenu, MenuItem as MuiMenuItem,
-  useMediaQuery, Drawer, List, ListItem, ListItemText, ListItemIcon,
-  CssBaseline
-} from '@mui/material';
+  AppBar,
+  Box,
+  Toolbar,
+  Typography,
+  InputBase,
+  IconButton,
+  Avatar,
+  Button,
+  Divider,
+  Menu as MuiMenu,
+  MenuItem as MuiMenuItem,
+  useMediaQuery,
+  Drawer,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  CssBaseline,
+  CircularProgress,
+} from "@mui/material";
 import {
-  PersonAdd, Hotel, Logout, Receipt, Restaurant, RoomService,
-  Fastfood, AddShoppingCart, CheckCircleOutline, Assignment, AccountCircle
-} from '@mui/icons-material';
-import {
-  styled, alpha, useTheme, ThemeProvider
-} from '@mui/material/styles';
-import MenuIcon from '@mui/icons-material/Menu';
-import SearchIcon from '@mui/icons-material/Search';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+  PersonAdd,
+  Hotel,
+  Logout,
+  Receipt,
+  Restaurant,
+  RoomService,
+  Fastfood,
+  AddShoppingCart,
+  CheckCircleOutline,
+  Assignment,
+  AccountCircle,
+} from "@mui/icons-material";
+import { styled, alpha, useTheme, ThemeProvider } from "@mui/material/styles";
+import MenuIcon from "@mui/icons-material/Menu";
+import SearchIcon from "@mui/icons-material/Search";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import { auth } from "../../firebase-config";
 
-import CadastroQuarto from '../CrudQuarto';
-import CadastroCliente from '../CrudCliente';
-import hotelTheme from '../../theme';
+import CadastroQuarto from "../CrudQuarto";
 
-const pageComponents = {
+import hotelTheme from "../../theme";
+
+const componentesPorPagina = {
   "Cadastro de Quarto": <CadastroQuarto />,
-  "Cadastro de Cliente": <CadastroCliente />,
 };
 
 const menuPorSetor = {
@@ -30,56 +52,53 @@ const menuPorSetor = {
     "Cadastro de Cliente",
     "Nova Reserva (Check-in)",
     "Check-out Manual",
-    "Cadastro de Quarto"
+    "Cadastro de Quarto",
   ],
   Cozinha: [
     "Cadastro de Produto",
-    "Painel de Pedidos (Real-Time)",
-    "Adicionar Pedido"
+    "Painel de Pedidos (Tempo Real)",
+    "Adicionar Pedido",
   ],
   Financeiro: [
     "Fatura Detalhada",
     "Registro de Pagamento",
     "Relatório por Quarto",
-    "Integração com Pagamentos"
+    "Integração com Pagamentos",
   ],
-  Serviços: [
-    "Abrir Comanda",
-    "Consumos Extras",
-  ]
+  Serviços: ["Abrir Comanda", "Consumos Extras"],
 };
 
-const Search = styled('div')(({ theme }) => ({
-  position: 'relative',
+const Pesquisa = styled("div")(({ theme }) => ({
+  position: "relative",
   borderRadius: theme.shape.borderRadius,
   backgroundColor: alpha(theme.palette.common.white, 0.1),
-  '&:hover': {
+  "&:hover": {
     backgroundColor: alpha(theme.palette.common.white, 0.2),
   },
-  width: '100%',
+  width: "100%",
 }));
 
-const SearchIconWrapper = styled('div')(({ theme }) => ({
+const WrapperIconePesquisa = styled("div")(({ theme }) => ({
   padding: theme.spacing(0, 2),
-  height: '100%',
-  position: 'absolute',
-  pointerEvents: 'none',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
+  height: "100%",
+  position: "absolute",
+  pointerEvents: "none",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
 }));
 
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: 'inherit',
-  width: '100%',
+const CampoPesquisa = styled(InputBase)(({ theme }) => ({
+  color: "inherit",
+  width: "100%",
   paddingLeft: `calc(1em + ${theme.spacing(4)})`,
   paddingRight: theme.spacing(2),
   paddingTop: theme.spacing(1),
   paddingBottom: theme.spacing(1),
 }));
 
-const CustomMenu = styled(MuiMenu)(({ theme }) => ({
-  '& .MuiPaper-root': {
+const MenuCustomizado = styled(MuiMenu)(({ theme }) => ({
+  "& .MuiPaper-root": {
     backgroundColor: alpha(theme.palette.background.paper, 0.95),
     borderRadius: theme.shape.borderRadius,
     boxShadow: theme.shadows[4],
@@ -88,29 +107,29 @@ const CustomMenu = styled(MuiMenu)(({ theme }) => ({
   },
 }));
 
-const CustomMenuItem = styled(MuiMenuItem)(({ theme }) => ({
+const ItemMenuCustomizado = styled(MuiMenuItem)(({ theme }) => ({
   borderRadius: theme.shape.borderRadius / 1.5,
   padding: theme.spacing(1.2, 2),
   fontWeight: 500,
-  fontSize: '0.95rem',
-  display: 'flex',
-  alignItems: 'center',
+  fontSize: "0.95rem",
+  display: "flex",
+  alignItems: "center",
   gap: theme.spacing(1),
-  transition: 'all 0.2s',
-  '&:hover': {
+  transition: "all 0.2s",
+  "&:hover": {
     backgroundColor: alpha(theme.palette.primary.main, 0.1),
     color: theme.palette.primary.main,
   },
 }));
 
-const getIcon = (label) => {
-  const icons = {
+const obterIcone = (rotulo) => {
+  const icones = {
     "Cadastro de Cliente": <PersonAdd fontSize="small" />,
     "Nova Reserva (Check-in)": <Hotel fontSize="small" />,
     "Check-out Manual": <Logout fontSize="small" />,
     "Cadastro de Quarto": <RoomService fontSize="small" />,
     "Cadastro de Produto": <Fastfood fontSize="small" />,
-    "Painel de Pedidos (Real-Time)": <Restaurant fontSize="small" />,
+    "Painel de Pedidos (Tempo Real)": <Restaurant fontSize="small" />,
     "Adicionar Pedido": <AddShoppingCart fontSize="small" />,
     "Fatura Detalhada": <Receipt fontSize="small" />,
     "Registro de Pagamento": <Assignment fontSize="small" />,
@@ -119,44 +138,62 @@ const getIcon = (label) => {
     "Abrir Comanda": <RoomService fontSize="small" />,
     "Consumos Extras": <Fastfood fontSize="small" />,
   };
-  return icons[label] || <Assignment fontSize="small" />;
+  return icones[rotulo] || <Assignment fontSize="small" />;
 };
 
-function CustomAppBar({ setCurrentPage }) {
-  const [anchorEl, setAnchorEl] = React.useState({});
-  const [userAnchor, setUserAnchor] = React.useState(null);
-  const [drawerOpen, setDrawerOpen] = React.useState(false);
+function BarraAppCustomizada({ definirPaginaAtual }) {
+  const [ancora, setAncora] = React.useState({});
+  const [ancoraUsuario, setAncoraUsuario] = React.useState(null);
+  const [gavetaAberta, setGavetaAberta] = React.useState(false);
+  const [carregandoLogout, setCarregandoLogout] = React.useState(false);
 
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const tema = useTheme();
+  const ehMobile = useMediaQuery(tema.breakpoints.down("md"));
 
-  const handleOpen = (setor) => (event) => {
-    setAnchorEl((prev) => ({ ...prev, [setor]: event.currentTarget }));
+  const fazerLogout = async () => {
+    setCarregandoLogout(true);
+    try {
+      await auth.signOut();
+      window.location.href = "/login";
+    } catch (erro) {
+      console.error("Erro ao fazer logout:", erro);
+      setCarregandoLogout(false);
+    }
   };
 
-  const handleClose = (setor) => () => {
-    setAnchorEl((prev) => ({ ...prev, [setor]: null }));
+  const abrirMenu = (setor) => (evento) => {
+    setAncora((prev) => ({ ...prev, [setor]: evento.currentTarget }));
   };
 
-  const handleUserClick = (event) => {
-    setUserAnchor(event.currentTarget);
+  const fecharMenu = (setor) => () => {
+    setAncora((prev) => ({ ...prev, [setor]: null }));
   };
 
-  const handleUserClose = () => {
-    setUserAnchor(null);
+  const clicarUsuario = (evento) => {
+    setAncoraUsuario(evento.currentTarget);
   };
 
-  const toggleDrawer = (open) => () => {
-    setDrawerOpen(open);
+  const fecharMenuUsuario = () => {
+    setAncoraUsuario(null);
+  };
+
+  const alternarGaveta = (abrir) => () => {
+    setGavetaAberta(abrir);
   };
 
   return (
     <>
-      <AppBar position="fixed" color="primary" sx={{ borderRadius: '0 0 16px 16px' }}>
-        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', px: 2 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {isMobile && (
-              <IconButton onClick={toggleDrawer(true)} color="inherit">
+      <AppBar
+        position="fixed"
+        color="primary"
+        sx={{ borderRadius: "0 0 16px 16px" }}
+      >
+        <Toolbar
+          sx={{ display: "flex", justifyContent: "space-between", px: 2 }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            {ehMobile && (
+              <IconButton onClick={alternarGaveta(true)} color="inherit">
                 <MenuIcon />
               </IconButton>
             )}
@@ -165,70 +202,93 @@ function CustomAppBar({ setCurrentPage }) {
             </Typography>
           </Box>
 
-          {!isMobile && (
-            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+          {!ehMobile && (
+            <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
               {Object.keys(menuPorSetor).map((setor) => (
                 <div key={setor}>
                   <Button
                     color="inherit"
                     endIcon={<ArrowDropDownIcon />}
-                    onClick={handleOpen(setor)}
+                    onClick={abrirMenu(setor)}
                   >
                     {setor}
                   </Button>
-                  <CustomMenu
-                    anchorEl={anchorEl[setor]}
-                    open={Boolean(anchorEl[setor])}
-                    onClose={handleClose(setor)}
+                  <MenuCustomizado
+                    anchorEl={ancora[setor]}
+                    open={Boolean(ancora[setor])}
+                    onClose={fecharMenu(setor)}
                   >
-                    {menuPorSetor[setor].map((item, index) => (
+                    {menuPorSetor[setor].map((item, indice) => (
                       <React.Fragment key={item}>
-                        <CustomMenuItem
+                        <ItemMenuCustomizado
                           onClick={() => {
-                            setCurrentPage(item);
-                            handleClose(setor)();
+                            definirPaginaAtual(item);
+                            fecharMenu(setor)();
                           }}
                         >
-                          <ListItemIcon sx={{ minWidth: 28 }}>{getIcon(item)}</ListItemIcon>
+                          <ListItemIcon sx={{ minWidth: 28 }}>
+                            {obterIcone(item)}
+                          </ListItemIcon>
                           <ListItemText primary={item} />
-                        </CustomMenuItem>
-                        {index < menuPorSetor[setor].length - 1 && <Divider sx={{ my: 0.5 }} />}
+                        </ItemMenuCustomizado>
+                        {indice < menuPorSetor[setor].length - 1 && (
+                          <Divider sx={{ my: 0.5 }} />
+                        )}
                       </React.Fragment>
                     ))}
-                  </CustomMenu>
+                  </MenuCustomizado>
                 </div>
               ))}
             </Box>
           )}
 
-          {!isMobile && (
+          {!ehMobile && (
             <Box sx={{ flexGrow: 1, maxWidth: 400, mx: 2 }}>
-              <Search>
-                <SearchIconWrapper>
+              <Pesquisa>
+                <WrapperIconePesquisa>
                   <SearchIcon />
-                </SearchIconWrapper>
-                <StyledInputBase placeholder="Buscar..." inputProps={{ 'aria-label': 'search' }} />
-              </Search>
+                </WrapperIconePesquisa>
+                <CampoPesquisa
+                  placeholder="Buscar..."
+                  inputProps={{ "aria-label": "search" }}
+                />
+              </Pesquisa>
             </Box>
           )}
 
           <Box>
-            <IconButton onClick={handleUserClick}>
+            <IconButton onClick={clicarUsuario}>
               <Avatar alt="Usuário" src="/user.jpg" />
             </IconButton>
             <MuiMenu
-              anchorEl={userAnchor}
-              open={Boolean(userAnchor)}
-              onClose={handleUserClose}
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              anchorEl={ancoraUsuario}
+              open={Boolean(ancoraUsuario)}
+              onClose={fecharMenuUsuario}
+              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
             >
-              <MuiMenuItem onClick={handleUserClose}>
-                <ListItemIcon><AccountCircle fontSize="small" /></ListItemIcon>
+              <MuiMenuItem onClick={fecharMenuUsuario}>
+                <ListItemIcon>
+                  <AccountCircle fontSize="small" />
+                </ListItemIcon>
                 <ListItemText primary="Perfil" />
               </MuiMenuItem>
-              <MuiMenuItem onClick={handleUserClose}>
-                <ListItemIcon><Logout fontSize="small" /></ListItemIcon>
-                <ListItemText primary="Sair" />
+              <MuiMenuItem
+                onClick={() => {
+                  fecharMenuUsuario();
+                  fazerLogout();
+                }}
+                disabled={carregandoLogout}
+              >
+                <ListItemIcon>
+                  {carregandoLogout ? (
+                    <CircularProgress size={20} />
+                  ) : (
+                    <Logout fontSize="small" />
+                  )}
+                </ListItemIcon>
+                <ListItemText
+                  primary={carregandoLogout ? "Saindo..." : "Sair"}
+                />
               </MuiMenuItem>
             </MuiMenu>
           </Box>
@@ -237,22 +297,39 @@ function CustomAppBar({ setCurrentPage }) {
 
       <Drawer
         anchor="left"
-        open={drawerOpen}
-        onClose={toggleDrawer(false)}
+        open={gavetaAberta}
+        onClose={alternarGaveta(false)}
         ModalProps={{ keepMounted: true }}
-        sx={{ zIndex: (theme) => theme.zIndex.appBar + 1 }}
+        sx={{ zIndex: (tema) => tema.zIndex.appBar + 1 }}
       >
-        <Box sx={{ width: 280, p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box
+          sx={{
+            width: 280,
+            p: 2,
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
             <Typography variant="h6">Menu</Typography>
-            <IconButton onClick={toggleDrawer(false)}>
+            <IconButton onClick={alternarGaveta(false)}>
               <MenuIcon />
             </IconButton>
           </Box>
 
           {Object.keys(menuPorSetor).map((setor) => (
             <Box key={setor}>
-              <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1, color: 'text.secondary' }}>
+              <Typography
+                variant="subtitle2"
+                sx={{ fontWeight: 700, mb: 1, color: "text.secondary" }}
+              >
                 {setor}
               </Typography>
               <List dense>
@@ -261,24 +338,26 @@ function CustomAppBar({ setCurrentPage }) {
                     button
                     key={item}
                     onClick={() => {
-                      setCurrentPage(item);
-                      toggleDrawer(false)();
+                      definirPaginaAtual(item);
+                      alternarGaveta(false)();
                     }}
                     sx={{
                       borderRadius: 1,
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
+                      cursor: "pointer",
+                      transition: "all 0.2s ease",
                       px: 2,
-                      '&:hover': {
-                        backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                        color: theme.palette.primary.main,
+                      "&:hover": {
+                        backgroundColor: alpha(tema.palette.primary.main, 0.1),
+                        color: tema.palette.primary.main,
                       },
-                      '&:active': {
-                        backgroundColor: alpha(theme.palette.primary.main, 0.2),
+                      "&:active": {
+                        backgroundColor: alpha(tema.palette.primary.main, 0.2),
                       },
                     }}
                   >
-                    <ListItemIcon sx={{ minWidth: 28 }}>{getIcon(item)}</ListItemIcon>
+                    <ListItemIcon sx={{ minWidth: 28 }}>
+                      {obterIcone(item)}
+                    </ListItemIcon>
                     <ListItemText primary={item} />
                   </ListItem>
                 ))}
@@ -292,15 +371,17 @@ function CustomAppBar({ setCurrentPage }) {
   );
 }
 
-export default function ThemedAppBar() {
-  const [currentPage, setCurrentPage] = React.useState("Cadastro de Quarto");
+export default function BarraAppTematizada() {
+  const [paginaAtual, setPaginaAtual] = React.useState("Cadastro de Quarto");
 
   return (
     <ThemeProvider theme={hotelTheme}>
       <CssBaseline />
-      <CustomAppBar setCurrentPage={setCurrentPage} />
+      <BarraAppCustomizada definirPaginaAtual={setPaginaAtual} />
       <Box component="main" sx={{ mt: { xs: 8, sm: 10 }, p: 3 }}>
-        {pageComponents[currentPage] || <Typography>Selecione uma opção no menu</Typography>}
+        {componentesPorPagina[paginaAtual] || (
+          <Typography>Selecione uma opção no menu</Typography>
+        )}
       </Box>
     </ThemeProvider>
   );

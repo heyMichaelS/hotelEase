@@ -1,27 +1,25 @@
 package com.br.hotelEase.utils;
+
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.PostConstruct;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 @Configuration
 public class FirebaseConfig {
 
-    @PostConstruct
-    public void initFirebase() throws IOException {
-        FileInputStream serviceAccount = new FileInputStream("src/main/resources/firebase/serviceAccountkey.json");
+    @Bean
+    public FirebaseApp firebaseApp() throws IOException {
+        FileInputStream serviceAccount = new FileInputStream("src/main/resources/firebase/serviceAccountKey.json");
 
         FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                 .build();
 
-        if (FirebaseApp.getApps().isEmpty()) {
-            FirebaseApp.initializeApp(options);
-        }
+        return FirebaseApp.initializeApp(options);
     }
 }
