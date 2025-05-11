@@ -1,9 +1,10 @@
-HELP.md
+# Firebase secret key - NÃO versionar
+backend/src/main/resources/firebase/serviceAccountkey.json
+# Maven
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-
 ### STS ###
 .apt_generated
 .classpath
@@ -29,5 +30,8 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
+
 .vscode/
+
+.DS_Store
+Thumbs.db

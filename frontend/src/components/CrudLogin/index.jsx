@@ -1,37 +1,66 @@
-import * as React from 'react';
+import * as React from "react";
 import {
-  Avatar, Button, TextField, Link, Grid, Box, Typography, Container,
-  CssBaseline, Paper, Divider, IconButton, InputAdornment
-} from '@mui/material';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import GoogleIcon from '@mui/icons-material/Google';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { login } from '../../login_firebase';
-import { auth } from '../../firebase-config';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+  Avatar,
+  Button,
+  TextField,
+  Link,
+  Grid,
+  Box,
+  Typography,
+  Container,
+  CssBaseline,
+  Paper,
+  Divider,
+  IconButton,
+  InputAdornment,
+  CircularProgress,
+  Snackbar,
+  Alert,
+} from "@mui/material";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import GoogleIcon from "@mui/icons-material/Google";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import { login } from "../../login_firebase";
+import { auth } from "../../firebase-config";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 const theme = createTheme();
 
 export default function SignIn() {
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [showPassword, setShowPassword] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState(null);
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        navigate("/");
+      }
+    });
+    return () => unsubscribe();
+  }, [navigate]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const email = data.get('email');
-    const password = data.get('password');
+    const email = data.get("email");
+    const password = data.get("password");
 
     try {
+      setLoading(true);
       const usuario = await login(email, password);
-      console.log('Usuário autenticado:', usuario);
-      // Aqui você pode redirecionar ou armazenar os dados no contexto
+      console.log("Usuário autenticado:", usuario);
+      navigate("/");
     } catch (error) {
-      console.error('Erro no login:', error.message);
-      // Exibir mensagem de erro para o usuário, se quiser
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -39,25 +68,43 @@ export default function SignIn() {
     const provider = new GoogleAuthProvider();
 
     try {
+      setLoading(true);
+      setError(null);
+
       const result = await signInWithPopup(auth, provider);
       const token = await result.user.getIdToken();
 
       const response = await fetch("http://localhost:8080/usuario/auth", {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
       });
 
-      console.log("teste", token);
-
-      if (!response.ok) throw new Error("Erro ao autenticar com o backend");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || "Erro ao autenticar com o backend"
+        );
+      }
 
       const usuario = await response.json();
       console.log("Usuário autenticado com Google:", usuario);
-      // Redirecionar ou armazenar usuário
+
+      navigate("/");
     } catch (error) {
-      console.error("Erro no login com Google:", error.message);
+      console.error("Erro no login com Google:", error);
+      setError(error.message || "Erro ao fazer login com Google");
+
+      try {
+        await auth.signOut();
+      } catch (logoutError) {
+        console.error("Erro ao fazer logout:", logoutError);
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -65,25 +112,57 @@ export default function SignIn() {
     setShowPassword(!showPassword);
   };
 
+  const handleCloseError = () => {
+    setError(null);
+  };
+
   return (
     <ThemeProvider theme={theme}>
-      <Container component="main" maxWidth="sm" sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
+      <Container
+        component="main"
+        maxWidth="sm"
+        sx={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         <CssBaseline />
-        <Paper elevation={6} sx={{
-          padding: 4,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          width: '100%',
-          maxWidth: 450,
-          borderRadius: 3,
-        }}>
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+        <Paper
+          elevation={6}
+          sx={{
+            padding: 4,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            width: "100%",
+            maxWidth: 450,
+            borderRadius: 3,
+            position: "relative",
+          }}
+        >
+          {loading && (
+            <Box
+              sx={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "rgba(255, 255, 255, 0.7)",
+                zIndex: 1,
+                borderRadius: 3,
+              }}
+            >
+              <CircularProgress size={60} />
+            </Box>
+          )}
+
+          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
@@ -92,18 +171,19 @@ export default function SignIn() {
 
           <Button
             onClick={handleGoogleSignIn}
+            disabled={loading}
             fullWidth
             variant="contained"
             startIcon={<GoogleIcon />}
             sx={{
-              backgroundColor: '#ffffff',
-              color: 'rgba(0,0,0,0.6)',
-              border: '1px solid #dadce0',
-              textTransform: 'none',
+              backgroundColor: "#ffffff",
+              color: "rgba(0,0,0,0.6)",
+              border: "1px solid #dadce0",
+              textTransform: "none",
               fontWeight: 500,
-              '&:hover': {
-                backgroundColor: '#f7f7f7',
-                border: '1px solid #c6c6c6',
+              "&:hover": {
+                backgroundColor: "#f7f7f7",
+                border: "1px solid #c6c6c6",
               },
               mb: 2,
             }}
@@ -111,9 +191,14 @@ export default function SignIn() {
             Entrar com Google
           </Button>
 
-          <Divider sx={{ width: '100%', my: 2 }}>Ou</Divider>
+          <Divider sx={{ width: "100%", my: 2 }}>Ou</Divider>
 
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, width: '100%' }}>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            noValidate
+            sx={{ mt: 1, width: "100%" }}
+          >
             <TextField
               margin="normal"
               required
@@ -123,6 +208,7 @@ export default function SignIn() {
               name="email"
               autoComplete="email"
               autoFocus
+              disabled={loading}
             />
             <TextField
               margin="normal"
@@ -130,31 +216,54 @@ export default function SignIn() {
               fullWidth
               name="password"
               label="Senha"
-              type={showPassword ? 'text' : 'password'}
+              type={showPassword ? "text" : "password"}
               id="password"
               autoComplete="current-password"
+              disabled={loading}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton onClick={handleClickShowPassword} edge="end">
-                      {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                    <IconButton
+                      onClick={handleClickShowPassword}
+                      edge="end"
+                      disabled={loading}
+                    >
+                      {showPassword ? (
+                        <VisibilityOffIcon />
+                      ) : (
+                        <VisibilityIcon />
+                      )}
                     </IconButton>
                   </InputAdornment>
                 ),
               }}
             />
-            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
-              Entrar
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+              disabled={loading}
+            >
+              {loading ? <CircularProgress size={24} /> : "Entrar"}
             </Button>
 
-            <Grid container spacing={2} sx={{ justifyContent: 'space-between', textAlign: 'center' }}>
+            <Grid
+              container
+              spacing={2}
+              sx={{ justifyContent: "space-between", textAlign: "center" }}
+            >
               <Grid item xs={12} sm={6}>
-                <Link href="#" variant="body2" sx={{ textDecoration: 'none' }}>
+                <Link href="#" variant="body2" sx={{ textDecoration: "none" }}>
                   Esqueceu a senha?
                 </Link>
               </Grid>
               <Grid item xs={12} sm={6}>
-                <Link href="#" variant="body2" sx={{ textDecoration: 'none' }}>
+                <Link
+                  href="/cadastro"
+                  variant="body2"
+                  sx={{ textDecoration: "none" }}
+                >
                   {"Não tem uma conta? Cadastre-se"}
                 </Link>
               </Grid>
@@ -162,6 +271,21 @@ export default function SignIn() {
           </Box>
         </Paper>
       </Container>
+
+      <Snackbar
+        open={!!error}
+        autoHideDuration={6000}
+        onClose={handleCloseError}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseError}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          {error}
+        </Alert>
+      </Snackbar>
     </ThemeProvider>
   );
 }
