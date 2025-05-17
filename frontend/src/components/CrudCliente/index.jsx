@@ -24,7 +24,6 @@ const CrudUsuario = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  // Para controle de erros
   const [errors, setErrors] = useState({
     email: '',
     telefone: '',
@@ -37,7 +36,7 @@ const CrudUsuario = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setErrors((prev) => ({ ...prev, [name]: '' }));  // Limpar erros ao alterar os dados
+    setErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
   const toggleShowPassword = () => {
@@ -68,7 +67,6 @@ const CrudUsuario = () => {
     loadUsuarios();
   }, []);
 
-  // Função para formatar telefone (já estava implementada)
   const formatarTelefone = (value) => {
     value = value.replace(/\D/g, '');
     if (value.length > 11) value = value.slice(0, 11);
@@ -86,7 +84,6 @@ const CrudUsuario = () => {
     setFormData((prev) => ({ ...prev, telefone: value }));
   };
 
-  // Função para formatar CPF
   const formatarCPF = (value) => {
     value = value.replace(/\D/g, '');
     if (value.length > 11) value = value.slice(0, 11);
@@ -116,7 +113,6 @@ const CrudUsuario = () => {
     let isValid = true;
     let validationErrors = {};
 
-    // Validar Email
     if (!formData.email.trim()) {
       validationErrors.email = 'O e-mail é obrigatório.';
       isValid = false;
@@ -125,7 +121,6 @@ const CrudUsuario = () => {
       isValid = false;
     }
 
-    // Validar CPF
     if (!formData.cpf.trim()) {
       validationErrors.cpf = 'O CPF é obrigatório.';
       isValid = false;
@@ -134,7 +129,6 @@ const CrudUsuario = () => {
       isValid = false;
     }
 
-    // Validar Telefone
     if (!formData.telefone.trim()) {
       validationErrors.telefone = 'O telefone é obrigatório.';
       isValid = false;
