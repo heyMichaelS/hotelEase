@@ -5,10 +5,11 @@ import {
   Box, GlobalStyles
 } from '@mui/material';
 import { Visibility, VisibilityOff, Google as GoogleIcon } from '@mui/icons-material';
-import { useTheme } from '@mui/material/styles';
+import { useTheme, ThemeProvider } from '@mui/material/styles';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '../../firebase-config';
 import api from '../../api';
+import hotelTheme from '../../theme'; // importa o theme customizado
 
 const CriarUsuario = () => {
   const [formData, setFormData] = useState({
@@ -138,84 +139,86 @@ const CriarUsuario = () => {
   };
 
   return (
-    <>
-      <GlobalStyles styles={{ html: { height: '100%', overflow: 'hidden' }, body: { height: '100%', margin: 0, overflow: 'hidden' } }} />
+    <ThemeProvider theme={hotelTheme}>
+      <>
+        <GlobalStyles styles={{ html: { height: '100%', overflow: 'hidden' }, body: { height: '100%', margin: 0, overflow: 'hidden' } }} />
 
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '100vh',
-          backgroundImage: 'url("https://images.pexels.com/photos/12277406/pexels-photo-12277406.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1")',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        <Container maxWidth="sm">
-          <Paper
-            sx={{
-              p: 4,
-              borderRadius: '20px',
-              boxShadow: 'none',
-              backdropFilter: 'blur(0px)',
-              backgroundColor: 'rgba(255, 255, 255, 0.6)',
-              border: 'none',
-            }}
-          >
-            <Stack spacing={3}>
-              <TextField label="Nome completo" name="nome" value={formData.nome} onChange={handleChange} fullWidth variant="outlined" />
-              <TextField label="E-mail" name="email" value={formData.email} onChange={handleChange} fullWidth error={!!errors.email} helperText={errors.email} variant="outlined" />
-              <TextField
-                label="Senha"
-                name="senha"
-                type={showPassword ? 'text' : 'password'}
-                value={formData.senha}
-                onChange={handleChange}
-                fullWidth
-                variant="outlined"
-                InputProps={{
-                  endAdornment: (
-                    <IconButton onClick={toggleShowPassword} edge="end">
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  ),
-                }}
-              />
-              <FormControl fullWidth variant="outlined">
-                <InputLabel>Tipo de Usuário</InputLabel>
-                <Select name="tipoUsuario" value={formData.tipoUsuario} label="Tipo de Usuário" onChange={handleChange}>
-                  <MenuItem value="CLIENTE">Cliente</MenuItem>
-                  <MenuItem value="FUNCIONARIO">Funcionário</MenuItem>
-                  <MenuItem value="ADMIN">Admin</MenuItem>
-                </Select>
-              </FormControl>
-              <TextField label="CPF" name="cpf" value={formData.cpf} onChange={handleCpfChange} fullWidth error={!!errors.cpf} helperText={errors.cpf} variant="outlined" />
-              <TextField label="Telefone" name="telefone" value={formData.telefone} onChange={handleTelefoneChange} fullWidth error={!!errors.telefone} helperText={errors.telefone} variant="outlined" />
-              
-              <Button variant="contained" size={isMobile ? 'small' : 'large'} onClick={handleSubmit} sx={{ borderRadius: '10px' }}>
-                Criar Conta
-              </Button>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '100vh',
+            backgroundImage: 'url("https://images.pexels.com/photos/12277406/pexels-photo-12277406.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1")',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        >
+          <Container maxWidth="sm">
+            <Paper
+              sx={{
+                p: 4,
+                borderRadius: '20px',
+                boxShadow: 'none',
+                backdropFilter: 'blur(0px)',
+                backgroundColor: 'rgba(255, 255, 255, 0.6)',
+                border: 'none',
+              }}
+            >
+              <Stack spacing={3}>
+                <TextField label="Nome completo" name="nome" value={formData.nome} onChange={handleChange} fullWidth variant="outlined" />
+                <TextField label="E-mail" name="email" value={formData.email} onChange={handleChange} fullWidth error={!!errors.email} helperText={errors.email} variant="outlined" />
+                <TextField
+                  label="Senha"
+                  name="senha"
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.senha}
+                  onChange={handleChange}
+                  fullWidth
+                  variant="outlined"
+                  InputProps={{
+                    endAdornment: (
+                      <IconButton onClick={toggleShowPassword} edge="end">
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    ),
+                  }}
+                />
+                <FormControl fullWidth variant="outlined">
+                  <InputLabel>Tipo de Usuário</InputLabel>
+                  <Select name="tipoUsuario" value={formData.tipoUsuario} label="Tipo de Usuário" onChange={handleChange}>
+                    <MenuItem value="CLIENTE">Cliente</MenuItem>
+                    <MenuItem value="FUNCIONARIO">Funcionário</MenuItem>
+                    <MenuItem value="ADMIN">Admin</MenuItem>
+                  </Select>
+                </FormControl>
+                <TextField label="CPF" name="cpf" value={formData.cpf} onChange={handleCpfChange} fullWidth error={!!errors.cpf} helperText={errors.cpf} variant="outlined" />
+                <TextField label="Telefone" name="telefone" value={formData.telefone} onChange={handleTelefoneChange} fullWidth error={!!errors.telefone} helperText={errors.telefone} variant="outlined" />
+                
+                <Button variant="contained" size={isMobile ? 'small' : 'large'} onClick={handleSubmit} sx={{ borderRadius: '10px' }}>
+                  Criar Conta
+                </Button>
 
-              <Button
-                variant="outlined"
-                startIcon={<GoogleIcon />}
-                onClick={cadastrarComGoogle}
-                sx={{ borderRadius: '10px' }}
-              >
-                Cadastrar com Google
-              </Button>
-            </Stack>
-          </Paper>
+                <Button
+                  variant="outlined"
+                  startIcon={<GoogleIcon />}
+                  onClick={cadastrarComGoogle}
+                  sx={{ borderRadius: '10px' }}
+                >
+                  Cadastrar com Google
+                </Button>
+              </Stack>
+            </Paper>
 
-          <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={() => setSnackbarOpen(false)}>
-            <Alert onClose={() => setSnackbarOpen(false)} severity="success">
-              {snackbarMessage}
-            </Alert>
-          </Snackbar>
-        </Container>
-      </Box>
-    </>
+            <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={() => setSnackbarOpen(false)}>
+              <Alert onClose={() => setSnackbarOpen(false)} severity="success">
+                {snackbarMessage}
+              </Alert>
+            </Snackbar>
+          </Container>
+        </Box>
+      </>
+    </ThemeProvider>
   );
 };
 

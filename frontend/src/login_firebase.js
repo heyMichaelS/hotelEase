@@ -1,4 +1,3 @@
-// login_firebase.js
 import { auth } from './firebase-config';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 
