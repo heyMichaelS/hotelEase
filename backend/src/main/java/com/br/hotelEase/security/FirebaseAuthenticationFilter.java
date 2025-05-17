@@ -53,18 +53,13 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
                 String nome = decodedToken.getName();
 
                 if (email != null) {
-                    Usuario usuario;
-                    try {
-                        usuario = usuarioService.buscarPorEmail(email);
-                    } catch (Exception e) {
-                        usuario = usuarioService.salvarUsuario(new UsuarioDTO(
-                                nome,
-                                email,
-                                null,
-                                TipoUsuario.CLIENTE,
-                                null,
-                                null
-                        ));
+                    Usuario usuario = usuarioService.buscarPorEmail(email);
+
+                    if (usuario == null) {
+                        usuario = usuarioService.salvarUsuarioGoogle(nome, email);
+                        System.out.println("Novo usuário Google salvo no banco: " + email);
+                    } else {
+                        System.out.println("Usuário já existe no banco: " + email);
                     }
 
                     UsuarioDetailsDTO usuarioDetails = new UsuarioDetailsDTO(usuario);
