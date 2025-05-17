@@ -1,5 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { Container, TextField, Button, Table, TableBody, TableCell, TableHead, TableRow, Paper, Stack, FormControl, InputLabel, Select, MenuItem, IconButton, Box, Snackbar, Alert, useMediaQuery } from '@mui/material';
+import {
+  Container,
+  TextField,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Paper,
+  Stack,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  IconButton,
+  Box,
+  Snackbar,
+  Alert,
+  useMediaQuery
+} from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import { NumericFormat } from 'react-number-format';
@@ -46,12 +66,12 @@ const CrudQuarto = () => {
 
   const handleSubmit = async () => {
     const { numero, tipo, precoDiaria, status } = formData;
-  
+
     if (!String(numero).trim() || !String(tipo).trim() || !String(precoDiaria).trim()) {
       showSnackbar('Por favor, preencha todos os campos corretamente.');
       return;
     }
-  
+
     try {
       if (editingId !== null) {
         await api.put(`quarto/atualizar-quarto/${editingId}`, formData);
@@ -67,7 +87,7 @@ const CrudQuarto = () => {
       showSnackbar('Erro ao salvar quarto');
     }
   };
-  
+
   const handleEdit = (quarto) => {
     setFormData(quarto);
     setEditingId(quarto.id);
@@ -103,7 +123,13 @@ const CrudQuarto = () => {
             label="Número"
             name="numero"
             value={formData.numero}
-            onChange={handleChange}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (/^\d*$/.test(value)) {
+                setFormData((prev) => ({ ...prev, numero: value }));
+              }
+            }}
+            inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
             fullWidth
           />
           <TextField
