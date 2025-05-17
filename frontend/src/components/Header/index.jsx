@@ -40,10 +40,13 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { auth } from "../../firebase-config";
 
 import CadastroQuarto from "../CrudQuarto";
+import CrudCliente from "../CrudCliente";
+
 
 import hotelTheme from "../../theme";
 
 const componentesPorPagina = {
+  "Cadastro de Cliente": <CrudCliente />,
   "Cadastro de Quarto": <CadastroQuarto />,
 };
 
