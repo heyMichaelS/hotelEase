@@ -107,7 +107,7 @@ const CriarUsuario = () => {
     if (!validateForm()) return;
 
     try {
-      await api.post('/usuario/criar-usuario', formData);
+      await api.post('/usuario/cadastro', formData);
       showSnackbar('Usuário criado com sucesso!');
       setFormData({ nome: '', email: '', senha: '', tipoUsuario: 'CLIENTE', cpf: '', telefone: '' });
       setTimeout(() => {

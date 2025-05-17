@@ -27,18 +27,16 @@ public class Usuario {
     private String email;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @NotBlank
-    @Column(nullable = false)
     private String senha;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_usuario", nullable = false)
     private TipoUsuario tipoUsuario;
 
-    @NotBlank
+
     @Size(max = 14)
     @Pattern(regexp = "\\d{11}|\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", message = "usuario.cpfPattern")
-    @Column(nullable = false, unique = true)
+    @Column( unique = true)
     private String cpf;
 
     @Pattern(regexp = "\\(?\\d{2}\\)?\\s?9?\\d{4}-\\d{4}", message = "usuario.telefone")
@@ -68,19 +66,19 @@ public class Usuario {
         this.nome = nome;
     }
 
-    public @Email @NotBlank String getEmail() {
+    public @Email String getEmail() {
         return email;
     }
 
-    public void setEmail(@Email @NotBlank String email) {
+    public void setEmail(@Email String email) {
         this.email = email;
     }
 
-    public @NotBlank String getSenha() {
+    public String getSenha() {
         return senha;
     }
 
-    public void setSenha(@NotBlank String senha) {
+    public void setSenha(String senha) {
         this.senha = senha;
     }
 
@@ -100,11 +98,11 @@ public class Usuario {
         this.dataCriacao = dataCriacao;
     }
 
-    public @NotBlank @Size(max = 14) @Pattern(regexp = "\\d{11}|\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", message = "cliente.cpfPattern") String getCpf() {
+    public @Size(max = 14) @Pattern(regexp = "\\d{11}|\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", message = "cliente.cpfPattern") String getCpf() {
         return cpf;
     }
 
-    public void setCpf(@NotBlank @Size(max = 14) @Pattern(regexp = "\\d{11}|\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", message = "cliente.cpfPattern") String cpf) {
+    public void setCpf(@Size(max = 14) @Pattern(regexp = "\\d{11}|\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", message = "cliente.cpfPattern") String cpf) {
         this.cpf = cpf;
     }
 
