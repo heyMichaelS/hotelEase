@@ -155,6 +155,38 @@ A aplicação estará disponível em: http://localhost:3000
 
 ```
 
+| Entregas            							|   O que foi entregue ?       |  O que foi entregue ?    |  O que foi entregue ?       |                                       |
+| -------------------------------------------- | ---------------- | ---------------- | -------------------------------------------------------------- | ----------------------------------------------------- |
+| 🟦 Fase 1 – Base do Sistema | Tela de Login | Tela de novo Cadastro caso 1º acesso a plataforma | Tela de Cadastro de Cliente  | Tela de Cadastro de Quarto |
+| | 3 Níveis de acesso | | | |
+| | Login convencional | | | |
+| | Login com conta Google | | | |
+| | | | | |
+| | | | | |
+| | | | | |
+| | | | | |
+| | | | | |
+| | | | | |
+| | | | | |
+| | | | | |
+| - | - | - | - | - |
+| | | | | |
+| 🟩 Fase 2 – Painel e Gestão Administrativa | | | | |
+| | | | | |
+| | | | | |
+| | | | | |
+| | | | | |
+| | | | | |
+| | | | | |
+| | | | | |
+| | | | | |
+| | | | | |
+| | | | | |
+| | | | | |
+
+
+
+
 Contribuidores
 
 | Avatar            							| integrante         | Função           		| GitHub                                                      | LinkedIn                                              |
