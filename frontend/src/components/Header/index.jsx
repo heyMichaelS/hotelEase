@@ -53,8 +53,8 @@ const componentesPorPagina = {
 const menuPorSetor = {
   Recepção: [
     "Cadastro de Cliente",
-    "Nova Reserva (Check-in)",
-    "Check-out Manual",
+    // "Nova Reserva (Check-in)",
+    // "Check-out Manual",
     "Cadastro de Quarto",
   ],
   Cozinha: [

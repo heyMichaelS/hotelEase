@@ -124,10 +124,11 @@ const CrudUsuario = () => {
     return re.test(cpf);
   };
 
-  const validateSenha = (senha) => {
-    const re = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
-    return re.test(senha);
-  };
+const validateSenha = (senha) => {
+  const re =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-])[A-Za-z\d!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]{6,}$/;
+  return re.test(senha);
+};
 
   const validateForm = () => {
     let isValid = true;

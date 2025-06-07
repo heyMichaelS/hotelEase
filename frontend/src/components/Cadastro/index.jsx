@@ -9,7 +9,7 @@ import { useTheme, ThemeProvider } from '@mui/material/styles';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '../../firebase-config';
 import api from '../../api';
-import hotelTheme from '../../theme'; // importa o theme customizado
+import hotelTheme from '../../theme';
 
 const CriarUsuario = () => {
   const [formData, setFormData] = useState({
@@ -20,10 +20,17 @@ const CriarUsuario = () => {
     cpf: '',
     telefone: '',
   });
+
   const [showPassword, setShowPassword] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [errors, setErrors] = useState({ email: '', telefone: '', cpf: '' });
+  const [errors, setErrors] = useState({
+    nome: '',
+    email: '',
+    senha: '',
+    cpf: '',
+    telefone: '',
+  });
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -46,6 +53,7 @@ const CriarUsuario = () => {
 
   const handleTelefoneChange = (e) => {
     setFormData((prev) => ({ ...prev, telefone: formatarTelefone(e.target.value) }));
+    setErrors((prev) => ({ ...prev, telefone: '' }));
   };
 
   const formatarCPF = (value) => {
@@ -58,6 +66,7 @@ const CriarUsuario = () => {
 
   const handleCpfChange = (e) => {
     setFormData((prev) => ({ ...prev, cpf: formatarCPF(e.target.value) }));
+    setErrors((prev) => ({ ...prev, cpf: '' }));
   };
 
   const validateEmail = (email) => /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
@@ -67,11 +76,21 @@ const CriarUsuario = () => {
     let isValid = true;
     let validationErrors = {};
 
+    if (!formData.nome.trim()) {
+      validationErrors.nome = 'O nome é obrigatório.';
+      isValid = false;
+    }
+
     if (!formData.email.trim()) {
       validationErrors.email = 'O e-mail é obrigatório.';
       isValid = false;
     } else if (!validateEmail(formData.email)) {
       validationErrors.email = 'E-mail inválido.';
+      isValid = false;
+    }
+
+    if (!formData.senha.trim()) {
+      validationErrors.senha = 'A senha é obrigatória.';
       isValid = false;
     }
 
@@ -98,17 +117,10 @@ const CriarUsuario = () => {
   };
 
   const handleSubmit = async () => {
-    const { nome, email, senha, cpf, telefone } = formData;
-
-    if (!nome.trim() || !email.trim() || !senha.trim() || !cpf.trim() || !telefone.trim()) {
-      showSnackbar('Todos os campos são obrigatórios.');
-      return;
-    }
-
     if (!validateForm()) return;
 
     try {
-      await api.post('/usuario/cadastro', formData);
+      await api.post('/usuario/criar-usuario', formData);
       showSnackbar('Usuário criado com sucesso!');
       setFormData({ nome: '', email: '', senha: '', tipoUsuario: 'CLIENTE', cpf: '', telefone: '' });
       setTimeout(() => {
@@ -116,7 +128,7 @@ const CriarUsuario = () => {
       }, 2000);
     } catch (error) {
       console.error('Erro ao criar usuário', error);
-      showSnackbar('Erro ao criar usuário');
+      showSnackbar('Problema ao criar usuário, tente novamente.');
     }
   };
 
@@ -166,8 +178,26 @@ const CriarUsuario = () => {
               }}
             >
               <Stack spacing={3}>
-                <TextField label="Nome completo" name="nome" value={formData.nome} onChange={handleChange} fullWidth variant="outlined" />
-                <TextField label="E-mail" name="email" value={formData.email} onChange={handleChange} fullWidth error={!!errors.email} helperText={errors.email} variant="outlined" />
+                <TextField
+                  label="Nome completo"
+                  name="nome"
+                  value={formData.nome}
+                  onChange={handleChange}
+                  fullWidth
+                  variant="outlined"
+                  error={!!errors.nome}
+                  helperText={errors.nome}
+                />
+                <TextField
+                  label="E-mail"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  fullWidth
+                  variant="outlined"
+                  error={!!errors.email}
+                  helperText={errors.email}
+                />
                 <TextField
                   label="Senha"
                   name="senha"
@@ -176,6 +206,8 @@ const CriarUsuario = () => {
                   onChange={handleChange}
                   fullWidth
                   variant="outlined"
+                  error={!!errors.senha}
+                  helperText={errors.senha}
                   InputProps={{
                     endAdornment: (
                       <IconButton onClick={toggleShowPassword} edge="end">
@@ -186,16 +218,43 @@ const CriarUsuario = () => {
                 />
                 <FormControl fullWidth variant="outlined">
                   <InputLabel>Tipo de Usuário</InputLabel>
-                  <Select name="tipoUsuario" value={formData.tipoUsuario} label="Tipo de Usuário" onChange={handleChange}>
+                  <Select
+                    name="tipoUsuario"
+                    value={formData.tipoUsuario}
+                    label="Tipo de Usuário"
+                    onChange={handleChange}
+                  >
                     <MenuItem value="CLIENTE">Cliente</MenuItem>
                     <MenuItem value="FUNCIONARIO">Funcionário</MenuItem>
                     <MenuItem value="ADMIN">Admin</MenuItem>
                   </Select>
                 </FormControl>
-                <TextField label="CPF" name="cpf" value={formData.cpf} onChange={handleCpfChange} fullWidth error={!!errors.cpf} helperText={errors.cpf} variant="outlined" />
-                <TextField label="Telefone" name="telefone" value={formData.telefone} onChange={handleTelefoneChange} fullWidth error={!!errors.telefone} helperText={errors.telefone} variant="outlined" />
-                
-                <Button variant="contained" size={isMobile ? 'small' : 'large'} onClick={handleSubmit} sx={{ borderRadius: '10px' }}>
+                <TextField
+                  label="CPF"
+                  name="cpf"
+                  value={formData.cpf}
+                  onChange={handleCpfChange}
+                  fullWidth
+                  variant="outlined"
+                  error={!!errors.cpf}
+                  helperText={errors.cpf}
+                />
+                <TextField
+                  label="Telefone"
+                  name="telefone"
+                  value={formData.telefone}
+                  onChange={handleTelefoneChange}
+                  fullWidth
+                  variant="outlined"
+                  error={!!errors.telefone}
+                  helperText={errors.telefone}
+                />
+                <Button
+                  variant="contained"
+                  size={isMobile ? 'small' : 'large'}
+                  onClick={handleSubmit}
+                  sx={{ borderRadius: '10px' }}
+                >
                   Criar Conta
                 </Button>
 
