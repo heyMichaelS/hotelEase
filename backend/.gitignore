@@ -1,5 +1,7 @@
 # Firebase secret key - NÃO versionar
 backend/src/main/resources/firebase/serviceAccountkey.json
+
+.env
 # Maven
 target/
 !.mvn/wrapper/maven-wrapper.jar
@@ -32,6 +34,5 @@ build/
 
 
 .vscode/
-.env
 .DS_Store
 Thumbs.db
