@@ -1,0 +1,42 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: analeal
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+              CREATE TYPE status_comanda AS ENUM ('aberta', 'fechada');
+  - changeSet:
+      id: 2
+      author: analeal
+      changes:
+        - createTable:
+            tableName: comanda
+            columns:
+              - column:
+                  name: id
+                  type: serial
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: reserva_id
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: status_comanda
+                  defaultValue: aberta
+              - column:
+                  name: valor_total
+                  type: decimal(10,2)
+                  defaultValueNumeric: 0
+
+        - addForeignKeyConstraint:
+            constraintName: fk_comanda_reserva
+            baseTableName: comanda
+            baseColumnNames: reserva_id
+            referencedTableName: reserva
+            referencedColumnNames: id
+            onDelete: CASCADE
