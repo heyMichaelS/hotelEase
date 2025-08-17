@@ -7,3 +7,9 @@ databaseChangeLog:
 
   - include:
       file: db/changelog/db.changelog-reserva.yaml
+
+  - include:
+      file: db/changelog/db.changelog-produto.yaml
+
+  - include:
+      file: db/changelog/db.changelog-comanda.yaml
