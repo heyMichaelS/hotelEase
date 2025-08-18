@@ -1,0 +1,236 @@
+import React, { useState, useEffect } from 'react';
+import {
+    Container,
+    TextField,
+    Button,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableRow,
+    Paper,
+    Stack,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    IconButton,
+    Box,
+    Snackbar,
+    Alert,
+    useMediaQuery
+} from '@mui/material';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
+import { Edit, Delete } from '@mui/icons-material';
+import { useTheme } from '@mui/material/styles';
+import { NumericFormat } from 'react-number-format';
+import { Typography } from '@mui/material';
+
+import api from '../../api';
+
+const CrudProduto = () => {
+    const [items, setItems] = useState([]);
+    const [formData, setFormData] = useState({
+        nome: '',
+        preco: '',
+        categoria: '',
+        disponivel: false,
+    });
+    const [editingId, setEditingId] = useState(null);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const showSnackbar = (message) => {
+        setSnackbarMessage(message);
+        setSnackbarOpen(true);
+    };
+
+    const loadProdutos = async () => {
+        try {
+            const response = await api.get('produto/buscar-produto');
+            setItems(response.data);
+        } catch (error) {
+            console.error('Erro ao carregar produto', error);
+            showSnackbar('Erro ao carregar produto');
+        }
+    };
+
+    useEffect(() => {
+        loadProdutos();
+    }, []);
+
+    const handleSubmit = async () => {
+        const { nome, preco, categoria, disponivel } = formData;
+
+        if (!String(nome).trim() || !String(preco).trim() || !String(categoria).trim()) {
+            showSnackbar('Por favor, preencha todos os campos corretamente.');
+            return;
+        }
+
+        try {
+            if (editingId !== null) {
+                await api.put(`produto/atualizar-produto/${editingId}`, formData);
+                showSnackbar('Produto atualizado com sucesso!');
+            } else {
+                await api.post('produto/criar-produto', formData);
+                showSnackbar('Produto adicionado com sucesso!');
+                console.log(formData);
+            }
+            await loadProdutos();
+            resetForm();
+        } catch (error) {
+            console.error('Erro ao salvar produto', error);
+            showSnackbar('Erro ao salvar produto');
+        }
+    };
+
+    const handleEdit = (produto) => {
+        setFormData(produto);
+        setEditingId(produto.id);
+    };
+
+    const handleDelete = async (id) => {
+        try {
+            await api.delete(`produto/delete-produto/${id}`);
+            showSnackbar('Produto removido com sucesso!');
+            await loadProdutos();
+            resetForm();
+        } catch (error) {
+            console.error('Erro ao deletar produto', error);
+            showSnackbar('Erro ao deletar produto');
+        }
+    };
+
+    const resetForm = () => {
+        setFormData({
+            nome: '',
+            preco: '',
+            categoria: '',
+            disponivel: false,
+        });
+        setEditingId(null);
+    };
+
+    return (
+        <Container maxWidth="md" sx={{ mt: 5 }}>
+            <Paper sx={{ p: 3 }}>
+                <Stack spacing={2} direction="column">
+
+                    <Typography variant="h5" align="center" gutterBottom sx={{ fontWeight: 'fine' }}>
+                        Cadastro de Produtos
+                    </Typography>
+                    <TextField
+                        label="Nome"
+                        name="nome"
+                        value={formData.nome}
+                        onChange={handleChange}
+                        fullWidth
+                    />
+                    <NumericFormat
+                        customInput={TextField}
+                        label="Preço do Produto"
+                        name="preco"
+                        value={formData.preco}
+                        onValueChange={(values) => {
+                            const { value } = values;
+                            setFormData((prev) => ({ ...prev, preco: value }));
+                        }}
+                        thousandSeparator="."
+                        decimalSeparator=","
+                        prefix="R$ "
+                        fullWidth
+                    />
+                    <TextField
+                        label="Categoria"
+                        name="categoria"
+                        value={formData.categoria}
+                        onChange={handleChange}
+                        fullWidth
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={formData.disponivel}
+                                onChange={(e) =>
+                                    setFormData((prev) => ({
+                                        ...prev,
+                                        disponivel: e.target.checked,
+                                    }))
+                                }
+                            />
+                        }
+                        label="Disponível"
+                    />
+
+                    <Stack direction="row" spacing={2}>
+                        <Button variant="contained" size={isMobile ? 'small' : 'medium'} onClick={handleSubmit}>
+                            {editingId !== null ? 'Atualizar' : 'Adicionar'}
+                        </Button>
+                        <Button variant="outlined" size={isMobile ? 'small' : 'medium'} onClick={resetForm}>
+                            Limpar
+                        </Button>
+                    </Stack>
+                </Stack>
+            </Paper>
+
+            <Paper sx={{ mt: 4 }}>
+                <Box sx={{ overflowX: 'auto' }}>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Nome</TableCell>
+                                <TableCell>Preço</TableCell>
+                                <TableCell>Categoria</TableCell>
+                                <TableCell>Disponivel</TableCell>
+                                <TableCell align="right">Ações</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {items.map((produto) => (
+                                <TableRow key={produto.id}>
+                                    <TableCell>{produto.nome}</TableCell>
+                                    <TableCell>R$ {Number(produto.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
+                                    <TableCell>{produto.categoria}</TableCell>
+                                    <TableCell>{produto.disponivel ? 'Sim' : 'Não'}</TableCell>
+                                    <TableCell align="right">
+                                        <Stack direction="row" spacing={1} justifyContent="flex-end">
+                                            <IconButton onClick={() => handleEdit(produto)} color="primary">
+                                                <Edit />
+                                            </IconButton>
+                                            <IconButton onClick={() => handleDelete(produto.id)} color="error">
+                                                <Delete />
+                                            </IconButton>
+                                        </Stack>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </Box>
+            </Paper>
+
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={3000}
+                onClose={() => setSnackbarOpen(false)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert onClose={() => setSnackbarOpen(false)} severity="success" sx={{ width: '100%' }}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
+        </Container>
+    );
+};
+
+export default CrudProduto;

@@ -23,6 +23,7 @@ import {
 import { Edit, Delete } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import { NumericFormat } from 'react-number-format';
+import { Typography } from '@mui/material';
 import api from '../../api';
 
 const CrudQuarto = () => {
@@ -119,6 +120,9 @@ const CrudQuarto = () => {
     <Container maxWidth="md" sx={{ mt: 5 }}>
       <Paper sx={{ p: 3 }}>
         <Stack spacing={2} direction="column">
+          <Typography variant="h5" align="center" gutterBottom sx={{ fontWeight: 'fine' }}>
+            Cadastro do Quarto
+          </Typography>
           <TextField
             label="Número"
             name="numero"

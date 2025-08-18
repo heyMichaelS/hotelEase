@@ -8,6 +8,7 @@ import { Visibility, VisibilityOff, Google as GoogleIcon } from '@mui/icons-mate
 import { useTheme, ThemeProvider } from '@mui/material/styles';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '../../firebase-config';
+import { Typography } from '@mui/material';
 import api from '../../api';
 import hotelTheme from '../../theme';
 
@@ -177,7 +178,9 @@ const CriarUsuario = () => {
                 border: 'none',
               }}
             >
+              
               <Stack spacing={3}>
+
                 <TextField
                   label="Nome completo"
                   name="nome"
