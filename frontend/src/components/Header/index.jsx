@@ -41,6 +41,7 @@ import { auth } from "../../firebase-config";
 
 import CadastroQuarto from "../CrudQuarto";
 import CrudCliente from "../CrudCliente";
+import CrudProduto from "../CrudProduto";
 
 
 import hotelTheme from "../../theme";
@@ -48,6 +49,7 @@ import hotelTheme from "../../theme";
 const componentesPorPagina = {
   "Cadastro de Cliente": <CrudCliente />,
   "Cadastro de Quarto": <CadastroQuarto />,
+  "Cadastro de Produto": <CrudProduto />,
 };
 
 const menuPorSetor = {
@@ -375,7 +377,7 @@ function BarraAppCustomizada({ definirPaginaAtual }) {
 }
 
 export default function BarraAppTematizada() {
-  const [paginaAtual, setPaginaAtual] = React.useState("Cadastro de Quarto");
+  const [paginaAtual, setPaginaAtual] = React.useState("Cadastro do Quarto");
 
   return (
     <ThemeProvider theme={hotelTheme}>

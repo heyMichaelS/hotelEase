@@ -22,6 +22,7 @@ import {
 } from "@mui/material";
 import { Edit, Delete, Visibility, VisibilityOff } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
+import { Typography } from '@mui/material';
 import api from "../../api";
 
 const CrudUsuario = () => {
@@ -236,6 +237,9 @@ const validateSenha = (senha) => {
     <Container maxWidth="md" sx={{ mt: 5 }}>
       <Paper sx={{ p: 3 }}>
         <Stack spacing={2} direction="column">
+              <Typography variant="h5" align="center" gutterBottom sx={{ fontWeight: 'fine' }}>
+            Cadastro de Cliente
+          </Typography>
           <TextField
             label="Nome"
             name="nome"
