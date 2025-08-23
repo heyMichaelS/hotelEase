@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -39,6 +40,12 @@ public class QuartoService {
 
     public List<Quarto> listarQuarto() {
         return this.quartoRepository.findAll();
+    }
+
+    public List<Quarto> listarNumeroQuarto() {
+        return this.quartoRepository.findAll().stream()
+                .filter(quarto -> quarto.getNumero() != null)
+                .toList();
     }
 
     public Optional<Quarto> buscarQuarto(Long id) {

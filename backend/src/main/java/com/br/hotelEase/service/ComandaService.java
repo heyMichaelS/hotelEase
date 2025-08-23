@@ -2,6 +2,7 @@ package com.br.hotelEase.service;
 
 import com.br.hotelEase.DTO.ComandaDTO;
 import com.br.hotelEase.entity.Comanda;
+import com.br.hotelEase.entity.Reserva;
 import com.br.hotelEase.repository.ComandaRepository;
 import com.br.hotelEase.utils.MensagemService;
 import jakarta.persistence.EntityNotFoundException;
@@ -22,7 +23,8 @@ public class ComandaService {
 
     public Comanda salvarComanda(ComandaDTO comandaDTO) {
         Comanda comanda = new Comanda();
-        comanda.setReservaId(comandaDTO.idReserva());
+
+        comanda.setNumeroQuarto(comandaDTO.numeroQuarto());
         comanda.setStatus(comandaDTO.status());
         comanda.setValorTotal(comandaDTO.valorTotal());
         return this.comandaRepository.save(comanda);
@@ -48,7 +50,7 @@ public class ComandaService {
         Comanda comanda = this.comandaRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(mensagemService.getMensagem("comanda.nao.encontrado", id)));
 
-        comanda.setReservaId(comandaDTO.idReserva());
+        comanda.setNumeroQuarto(comandaDTO.numeroQuarto());
         comanda.setStatus(comandaDTO.status());
         comanda.setValorTotal(comandaDTO.valorTotal());
 

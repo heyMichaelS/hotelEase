@@ -47,4 +47,11 @@ public class QuartoController {
         Quarto atualizado = this.quartoService.atualizarQuarto(quartoDTO, id);
         return ResponseEntity.ok(atualizado);
     }
+
+    @GetMapping("/listar-numero-quarto")
+    public ResponseEntity<List<Quarto>> listarNumeroQuarto() {
+        List<Quarto> quarto = this.quartoService.listarNumeroQuarto();
+        return ResponseEntity.ok(quarto);
+    }
+
 }
