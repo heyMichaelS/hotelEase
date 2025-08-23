@@ -46,31 +46,40 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             String token = parseToken(request);
+            System.out.println("Authorization header: " + request.getHeader("Authorization"));
 
             if (token != null) {
                 FirebaseToken decodedToken = FirebaseAuth.getInstance(firebaseApp).verifyIdToken(token);
                 String email = decodedToken.getEmail();
                 String nome = decodedToken.getName();
+                System.out.println("Token válido. Email: " + email + ", Nome: " + nome);
 
                 if (email != null) {
                     Usuario usuario = usuarioService.buscarPorEmail(email);
 
                     if (usuario == null) {
                         usuario = usuarioService.salvarUsuarioGoogle(nome, email);
-                        System.out.println("Novo usuário Google salvo no banco: " + email);
+                        if (usuario != null) {
+                            System.out.println("Novo usuário Google salvo no banco: " + usuario.getEmail());
+                        } else {
+                            System.err.println("Falha ao criar usuário Google para: " + email);
+                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Falha ao criar usuário Google");
+                            return;
+                        }
                     } else {
-                        System.out.println("Usuário já existe no banco: " + email);
+                        System.out.println("Usuário já existe no banco: " + usuario.getEmail());
                     }
 
                     UsuarioDetailsDTO usuarioDetails = new UsuarioDetailsDTO(usuario);
                     UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(usuarioDetails, null, usuarioDetails.getAuthorities());
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
+
         } catch (Exception e) {
+            System.err.println("Erro ao validar token Firebase: " + e.getMessage());
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido ou expirado: " + e.getMessage());
             return;
         }
