@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: analeal
+      changes:
+        - dropColumn:
+            tableName: comanda
+            columnName: reserva_id
+
+        - addColumn:
+            tableName: comanda
+            columns:
+              - column:
+                  name: numero_quarto
+                  type: int

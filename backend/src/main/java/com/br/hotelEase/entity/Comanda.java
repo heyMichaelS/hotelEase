@@ -13,8 +13,8 @@ public class Comanda {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "reserva_id", nullable = false)
-    private Long reservaId;
+    @Column(name = "numero-quarto")
+    private Integer numeroQuarto;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -31,12 +31,12 @@ public class Comanda {
         this.id = id;
     }
 
-    public Long getReservaId() {
-        return reservaId;
+    public Integer getNumeroQuarto() {
+        return numeroQuarto;
     }
 
-    public void setReservaId(Long reservaId) {
-        this.reservaId = reservaId;
+    public void setNumeroQuarto(Integer numeroQuarto) {
+        this.numeroQuarto = numeroQuarto;
     }
 
     public StatusComanda getStatus() {
