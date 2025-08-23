@@ -125,11 +125,11 @@ const CrudUsuario = () => {
     return re.test(cpf);
   };
 
-const validateSenha = (senha) => {
-  const re =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-])[A-Za-z\d!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]{6,}$/;
-  return re.test(senha);
-};
+  const validateSenha = (senha) => {
+    const re =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-])[A-Za-z\d!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]{6,}$/;
+    return re.test(senha);
+  };
 
   const validateForm = () => {
     let isValid = true;
@@ -237,8 +237,8 @@ const validateSenha = (senha) => {
     <Container maxWidth="md" sx={{ mt: 5 }}>
       <Paper sx={{ p: 3 }}>
         <Stack spacing={2} direction="column">
-              <Typography variant="h5" align="center" gutterBottom sx={{ fontWeight: 'fine' }}>
-            Cadastro de Cliente
+          <Typography variant="h5" align="left" gutterBottom sx={{ fontWeight: 'fine', color: '#BC7C8F' }}>
+            {editingId ? "Editar Cliente" : "Cadastrar Cliente"}
           </Typography>
           <TextField
             label="Nome"
