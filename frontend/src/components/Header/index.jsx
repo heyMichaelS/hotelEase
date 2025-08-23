@@ -42,6 +42,7 @@ import { auth } from "../../firebase-config";
 import CadastroQuarto from "../CrudQuarto";
 import CrudCliente from "../CrudCliente";
 import CrudProduto from "../CrudProduto";
+import CrudComanda from "../CrudComanda";
 
 
 import hotelTheme from "../../theme";
@@ -50,6 +51,8 @@ const componentesPorPagina = {
   "Cadastro de Cliente": <CrudCliente />,
   "Cadastro de Quarto": <CadastroQuarto />,
   "Cadastro de Produto": <CrudProduto />,
+  "Abrir Comanda" : <CrudComanda />,
+
 };
 
 const menuPorSetor = {

@@ -126,8 +126,8 @@ const CrudProduto = () => {
             <Paper sx={{ p: 3 }}>
                 <Stack spacing={2} direction="column">
 
-                    <Typography variant="h5" align="center" gutterBottom sx={{ fontWeight: 'fine' }}>
-                        Cadastro de Produtos
+                    <Typography variant="h5" align="left" gutterBottom sx={{ fontWeight: 'fine' , color: '#BC7C8F' }}>
+                        {editingId ? "Editar Produto" : "Cadastrar Produto"}
                     </Typography>
                     <TextField
                         label="Nome"
