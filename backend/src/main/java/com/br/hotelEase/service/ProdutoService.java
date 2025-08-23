@@ -26,6 +26,8 @@ public class ProdutoService {
         produto.setPreco(produtoDTO.preco());
         produto.setCategoria(produtoDTO.categoria());
         produto.setDisponivel(produtoDTO.disponivel());
+        produto.setQuantidade(produtoDTO.quantidade());
+        produto.setUnidadeMedida(produtoDTO.unidadeMedida());
         return this.produtoRepository.save(produto);
     }
 
@@ -53,6 +55,8 @@ public class ProdutoService {
         produto.setPreco(produtoDTO.preco());
         produto.setCategoria(produtoDTO.categoria());
         produto.setDisponivel(produtoDTO.disponivel());
+        produto.setQuantidade(produtoDTO.quantidade());
+        produto.setUnidadeMedida(produtoDTO.unidadeMedida());
 
         return this.produtoRepository.save(produto);
     }

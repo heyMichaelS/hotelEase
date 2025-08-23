@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: analeal
+      changes:
+        - sql:
+            sql: CREATE TYPE unidade_medida AS ENUM ('GRAMAS', 'KILOGRAMAS', 'MILILITROS', 'LITROS', 'UNIDADES');
+  - changeSet:
+      id: 2
+      author: analeal
+      changes:
+        - addColumn:
+            tableName: produto
+            columns:
+              - column:
+                  name: quantidade
+                  type: decimal(10,2)
+              - column:
+                  name: unidade_medida
+                  type: unidade_medida

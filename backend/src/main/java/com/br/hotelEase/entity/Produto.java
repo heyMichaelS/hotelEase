@@ -1,5 +1,6 @@
 package com.br.hotelEase.entity;
 
+import com.br.hotelEase.enuns.UnidadeMedida;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
@@ -27,6 +28,12 @@ public class Produto {
     private String categoria;
 
     private boolean disponivel = true;
+
+    private BigDecimal quantidade;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "unidade_medida", length = 20)
+    private UnidadeMedida unidadeMedida;
 
     public Long getId() {
         return id;
@@ -66,5 +73,21 @@ public class Produto {
 
     public void setDisponivel(boolean disponivel) {
         this.disponivel = disponivel;
+    }
+
+    public BigDecimal getQuantidade() {
+        return quantidade;
+    }
+
+    public void setQuantidade(BigDecimal quantidade) {
+        this.quantidade = quantidade;
+    }
+
+    public UnidadeMedida getUnidadeMedida() {
+        return unidadeMedida;
+    }
+
+    public void setUnidadeMedida(UnidadeMedida unidadeMedida) {
+        this.unidadeMedida = unidadeMedida;
     }
 }
