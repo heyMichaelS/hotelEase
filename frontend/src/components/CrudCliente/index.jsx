@@ -230,7 +230,6 @@ const CrudUsuario = () => {
       telefone: "",
     });
     setEditingId(null);
-    showSnackbar("Formulário limpo!");
   };
 
   return (
