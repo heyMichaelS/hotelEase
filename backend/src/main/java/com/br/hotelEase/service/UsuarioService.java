@@ -73,10 +73,7 @@ public class UsuarioService {
     }
 
     public Usuario buscarPorEmail(String email) {
-        return usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        mensagemService.getMensagem("email.nao.encontrado", email)
-                ));
+        return usuarioRepository.findByEmail(email).orElse(null);
     }
 
     public Usuario criarUsuarioEmailSenha(UsuarioDTO dto) throws FirebaseAuthException {
