@@ -33,6 +33,11 @@ const CrudQuarto = () => {
     precoDiaria: '',
     status: 'DISPONIVEL',
   });
+  const statusLabels = {
+  DISPONIVEL: 'Disponível',
+  OCUPADO: 'Ocupado',
+  MANUTENCAO: 'Manutenção',
+};
   const [editingId, setEditingId] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -195,7 +200,7 @@ const CrudQuarto = () => {
                   <TableCell>{quarto.numero}</TableCell>
                   <TableCell>{quarto.tipo}</TableCell>
                   <TableCell>R$ {Number(quarto.precoDiaria).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
-                  <TableCell>{quarto.status}</TableCell>
+                  <TableCell>{statusLabels[quarto.status]}</TableCell>
                   <TableCell align="right">
                     <Stack direction="row" spacing={1} justifyContent="flex-end">
                       <IconButton onClick={() => handleEdit(quarto)} color="primary">
