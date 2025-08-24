@@ -37,17 +37,7 @@ const CrudProduto = () => {
         preco: '',
         categoria: '',
         disponivel: false,
-        quantidade: '',
-        unidadeMedida: '',
-
     });
-    const statusLabels = {
-        GRAMA: 'Grama',
-        KILOGRAMA: 'Quilograma',
-        MILILITRO: 'Mililitro',
-        LITRO: 'Litro',
-        UNIDADE: 'Unidade',
-    };
     const [editingId, setEditingId] = useState(null);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -80,9 +70,9 @@ const CrudProduto = () => {
     }, []);
 
     const handleSubmit = async () => {
-        const { nome, preco, categoria, disponivel, quantidade, unidadeMedida } = formData;
+        const { nome, preco, categoria, disponivel } = formData;
 
-        if (!String(nome).trim() || !String(preco).trim() || !String(categoria).trim() || !String(quantidade).trim() || !String(unidadeMedida).trim()) {
+        if (!String(nome).trim() || !String(preco).trim() || !String(categoria).trim()) {
             showSnackbar('Por favor, preencha todos os campos corretamente.');
             return;
         }
@@ -127,9 +117,6 @@ const CrudProduto = () => {
             preco: '',
             categoria: '',
             disponivel: false,
-            quantidade: '',
-            unidadeMedida: '',
-
         });
         setEditingId(null);
     };
@@ -139,7 +126,7 @@ const CrudProduto = () => {
             <Paper sx={{ p: 3 }}>
                 <Stack spacing={2} direction="column">
 
-                    <Typography variant="h5" align="left" gutterBottom sx={{ fontWeight: 'fine', color: '#BC7C8F' }}>
+                    <Typography variant="h5" align="left" gutterBottom sx={{ fontWeight: 'fine' , color: '#BC7C8F' }}>
                         {editingId ? "Editar Produto" : "Cadastrar Produto"}
                     </Typography>
                     <TextField
@@ -170,53 +157,20 @@ const CrudProduto = () => {
                         onChange={handleChange}
                         fullWidth
                     />
-                    <Stack direction="row" spacing={2} alignItems="center">
-                        <NumericFormat
-                            customInput={TextField}
-                            label="Quantidade do Produto"
-                            name="quantidade"
-                            value={formData.quantidade}
-                            onValueChange={(values) => {
-                                const { value } = values;
-                                setFormData((prev) => ({ ...prev, quantidade: value }));
-                            }}
-                            thousandSeparator="."
-                            decimalSeparator=","
-                            fullWidth
-                            style={{ flex: 0.5 }}
-                        />
-
-                        <FormControl fullWidth style={{ flex: 0.5 }}>
-                            <InputLabel>Unidade de Medida</InputLabel>
-                            <Select
-                                name="unidadeMedida"
-                                value={formData.unidadeMedida}
-                                label="Unidade de Medida"
-                                onChange={handleChange}
-                            >
-                                <MenuItem value="GRAMA">Grama</MenuItem>
-                                <MenuItem value="KILOGRAMA">Quilograma</MenuItem>
-                                <MenuItem value="MILILITRO">Mililitro</MenuItem>
-                                <MenuItem value="LITRO">Litro</MenuItem>
-                                <MenuItem value="UNIDADE">Unidade</MenuItem>
-                            </Select>
-                        </FormControl>
-                        <FormControlLabel fullWidth style={{ flex: 1 }}
-                            control={
-                                <Checkbox
-                                    checked={formData.disponivel}
-                                    onChange={(e) =>
-                                        setFormData((prev) => ({
-                                            ...prev,
-                                            disponivel: e.target.checked,
-                                        }))
-                                    }
-                                />
-                            }
-                            label="Disponível"
-                        />
-
-                    </Stack>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={formData.disponivel}
+                                onChange={(e) =>
+                                    setFormData((prev) => ({
+                                        ...prev,
+                                        disponivel: e.target.checked,
+                                    }))
+                                }
+                            />
+                        }
+                        label="Disponível"
+                    />
 
                     <Stack direction="row" spacing={2}>
                         <Button variant="contained" size={isMobile ? 'small' : 'medium'} onClick={handleSubmit}>
@@ -238,8 +192,6 @@ const CrudProduto = () => {
                                 <TableCell>Preço</TableCell>
                                 <TableCell>Categoria</TableCell>
                                 <TableCell>Disponivel</TableCell>
-                                <TableCell>Quantidade</TableCell>
-                                <TableCell>Unidade de Medida</TableCell>
                                 <TableCell align="right">Ações</TableCell>
                             </TableRow>
                         </TableHead>
@@ -250,8 +202,6 @@ const CrudProduto = () => {
                                     <TableCell>R$ {Number(produto.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
                                     <TableCell>{produto.categoria}</TableCell>
                                     <TableCell>{produto.disponivel ? 'Sim' : 'Não'}</TableCell>
-                                    <TableCell>{produto.quantidade}</TableCell>
-                                    <TableCell>{statusLabels[produto.unidadeMedida]}</TableCell>
                                     <TableCell align="right">
                                         <Stack direction="row" spacing={1} justifyContent="flex-end">
                                             <IconButton onClick={() => handleEdit(produto)} color="primary">
