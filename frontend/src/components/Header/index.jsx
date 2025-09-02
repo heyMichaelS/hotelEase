@@ -61,6 +61,8 @@ const menuPorSetor = {
     // "Nova Reserva (Check-in)",
     // "Check-out Manual",
     "Cadastro de Quarto",
+    "Cadastrar Categoria",
+
   ],
   Cozinha: [
     "Cadastro de Produto",
