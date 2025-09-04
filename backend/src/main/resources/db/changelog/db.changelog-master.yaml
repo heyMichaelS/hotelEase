@@ -19,3 +19,9 @@ databaseChangeLog:
 
   - include:
       file: db/changelog/db.changelog-produto-update.yaml
+
+  - include:
+      file: db/changelog/db.changelog-categoria.yaml
+
+  - include:
+      file: db/changelog/db.changelog-produto-update2.yaml
