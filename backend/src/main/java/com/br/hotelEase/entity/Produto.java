@@ -1,6 +1,8 @@
 package com.br.hotelEase.entity;
 
 import com.br.hotelEase.enuns.UnidadeMedida;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
@@ -10,6 +12,10 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(name = "produto")
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id"
+)
 public class Produto {
 
     @Id

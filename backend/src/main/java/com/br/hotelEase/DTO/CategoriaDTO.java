@@ -1,4 +1,8 @@
 package com.br.hotelEase.DTO;
 
-public record CategoriaDTO (Long id, String nome, String descricao) {
+import com.br.hotelEase.entity.Produto;
+
+import java.util.List;
+
+public record CategoriaDTO (Long id, String nome, String descricao, List<Produto> produtos) {
 }
