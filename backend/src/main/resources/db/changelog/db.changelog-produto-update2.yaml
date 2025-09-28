@@ -1,0 +1,27 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: emanuelecampos
+      changes:
+        - dropColumn:
+            columnName: categoria
+            tableName: produto
+
+  - changeSet:
+      id: 2
+      author: emanuelecampos
+      changes:
+        - addColumn:
+            tableName: produto
+            columns:
+              - column:
+                  name: categoria_id
+                  type: int
+
+        - addForeignKeyConstraint:
+            baseTableName: produto
+            baseColumnNames: categoria_id
+            referencedTableName: categoria
+            referencedColumnNames: id
+            onDelete: SET NULL
+            constraintName: fk_produto_categoria

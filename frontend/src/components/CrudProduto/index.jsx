@@ -21,7 +21,6 @@ import {
     Alert,
     useMediaQuery
 } from '@mui/material';
-import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import { Edit, Delete } from '@mui/icons-material';
@@ -33,6 +32,7 @@ import api from '../../api';
 
 const CrudProduto = () => {
     const [items, setItems] = useState([]);
+    const [categorias, setCategorias] = useState([]); 
     const [page, setPage] = useState(1);
     const rowsPerPage = 4; // Quantidade de registros por página
     const [formData, setFormData] = useState({
@@ -88,8 +88,20 @@ const CrudProduto = () => {
         }
     };
 
+    
+    const loadCategorias = async () => {
+        try {
+            const response = await api.get('categoria/buscar-categoria');
+            setCategorias(response.data);
+        } catch (error) {
+            console.error('Erro ao carregar categorias', error);
+            showSnackbar('Erro ao carregar categorias');
+        }
+    };
+
     useEffect(() => {
         loadProdutos();
+        loadCategorias();
     }, []);
 
     const handleSubmit = async () => {
@@ -151,7 +163,7 @@ const CrudProduto = () => {
             <Paper sx={{ p: 3 }}>
                 <Stack spacing={2} direction="column">
 
-                    <Typography variant="h5" align="left" gutterBottom sx={{ fontWeight: 'fine', color: '#BC7C8F' }}>
+                    <Typography variant="h5" align="left" gutterBottom sx={{ fontWeight: 'fine' , color: '#BC7C8F' }}>
                         {editingId ? "Editar Produto" : "Cadastrar Produto"}
                     </Typography>
                     <TextField
@@ -175,13 +187,24 @@ const CrudProduto = () => {
                         prefix="R$ "
                         fullWidth
                     />
-                    <TextField
-                        label="Categoria"
-                        name="categoria"
-                        value={formData.categoria}
-                        onChange={handleChange}
-                        fullWidth
-                    />
+                    <FormControl fullWidth>
+                        <InputLabel id="categoria-label">Categoria</InputLabel>
+                        <Select
+                            labelId="categoria-label"
+                            name="categoria"
+                            value={formData.categoria?.id || ''}
+                            onChange={(e) => {
+                                const categoriaSelecionada = categorias.find(c => c.id === e.target.value);
+                                setFormData((prev) => ({ ...prev, categoria: categoriaSelecionada }));
+                            }}
+                        >
+                            {categorias.map((cat) => (
+                                <MenuItem key={cat.id} value={cat.id}>
+                                    {cat.nome}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
                     <Stack direction="row" spacing={2} alignItems="center">
                         <NumericFormat
                             customInput={TextField}
@@ -262,7 +285,7 @@ const CrudProduto = () => {
                                     <TableCell>
                                         R$ {Number(produto.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                                     </TableCell>
-                                    <TableCell>{produto.categoria}</TableCell>
+                                    <TableCell>{produto.categoria?.nome}</TableCell>
                                     <TableCell>{produto.disponivel ? 'Sim' : 'Não'}</TableCell>
                                     <TableCell>{produto.quantidade}</TableCell>
                                     <TableCell>{statusLabels[produto.unidadeMedida]}</TableCell>

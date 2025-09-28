@@ -1,6 +1,8 @@
 package com.br.hotelEase.entity;
 
 import com.br.hotelEase.enuns.UnidadeMedida;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
@@ -10,6 +12,10 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(name = "produto")
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id"
+)
 public class Produto {
 
     @Id
@@ -25,7 +31,9 @@ public class Produto {
     @Column(name = "preco", nullable = false, precision = 10, scale = 2)
     private BigDecimal preco;
 
-    private String categoria;
+    @ManyToOne
+    @JoinColumn(name = "categoria_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "fk_produto_categoria"))
+    private Categoria categoria;
 
     private boolean disponivel = true;
 
@@ -59,11 +67,11 @@ public class Produto {
         this.preco = preco;
     }
 
-    public String getCategoria() {
+    public Categoria getCategoria() {
         return categoria;
     }
 
-    public void setCategoria(String categoria) {
+    public void setCategoria(Categoria categoria) {
         this.categoria = categoria;
     }
 

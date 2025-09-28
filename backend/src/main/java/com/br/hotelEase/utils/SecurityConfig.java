@@ -53,6 +53,11 @@ public class SecurityConfig {
                         .requestMatchers("/reserva/criar-reserva").authenticated()
                         .requestMatchers("/reserva/atualizar-reserva/**").authenticated()
                         .requestMatchers("/reserva/delete-reserva/**").authenticated()
+                        .requestMatchers("/categoria/buscar-categoria").authenticated()
+                        .requestMatchers("/categoria/buscar-por-id/**").authenticated()
+                        .requestMatchers("/categoria/criar-categoria").authenticated()
+                        .requestMatchers("/categoria/atualizar-categoria/**").authenticated()
+                        .requestMatchers("/categoria/delete-categoria/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .exceptionHandling(exceptions -> exceptions
