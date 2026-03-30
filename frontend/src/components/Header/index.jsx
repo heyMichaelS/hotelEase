@@ -43,7 +43,7 @@ import CadastroQuarto from "../CrudQuarto";
 import CrudCliente from "../CrudCliente";
 import CrudProduto from "../CrudProduto";
 import CrudComanda from "../CrudComanda";
-
+import CrudCategoria from "../CrudCategoria";
 
 import hotelTheme from "../../theme";
 
@@ -52,6 +52,7 @@ const componentesPorPagina = {
   "Cadastro de Quarto": <CadastroQuarto />,
   "Cadastro de Produto": <CrudProduto />,
   "Abrir Comanda" : <CrudComanda />,
+  "Cadastrar Categoria": <CrudCategoria />,
 
 };
 
