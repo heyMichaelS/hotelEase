@@ -32,7 +32,7 @@ import api from '../../api';
 
 const CrudProduto = () => {
     const [items, setItems] = useState([]);
-    const [categorias, setCategorias] = useState([]); 
+    const [categorias, setCategorias] = useState([]);
     const [page, setPage] = useState(1);
     const rowsPerPage = 4; // Quantidade de registros por página
     const [formData, setFormData] = useState({
@@ -88,7 +88,7 @@ const CrudProduto = () => {
         }
     };
 
-    
+
     const loadCategorias = async () => {
         try {
             const response = await api.get('categoria/buscar-categoria');
@@ -162,8 +162,7 @@ const CrudProduto = () => {
         <Container maxWidth="md" sx={{ mt: 5 }}>
             <Paper sx={{ p: 3 }}>
                 <Stack spacing={2} direction="column">
-
-                    <Typography variant="h5" align="left" gutterBottom sx={{ fontWeight: 'fine' , color: '#BC7C8F' }}>
+                    <Typography variant="h5" align="left" gutterBottom sx={{ fontWeight: 'fine', color: '#BC7C8F' }}>
                         {editingId ? "Editar Produto" : "Cadastrar Produto"}
                     </Typography>
                     <TextField
@@ -187,10 +186,13 @@ const CrudProduto = () => {
                         prefix="R$ "
                         fullWidth
                     />
-                    <FormControl fullWidth>
-                        <InputLabel id="categoria-label">Categoria</InputLabel>
+
+                    <FormControl sx={{ m: 1, minWidth: 120 }}>
+                        <InputLabel id="demo-controlled-open-select-label">Categorias</InputLabel>
                         <Select
-                            labelId="categoria-label"
+                            labelId="demo-controlled-open-select-label"
+                            id="demo-controlled-open-select"
+                            label="Categorias"
                             name="categoria"
                             value={formData.categoria?.id || ''}
                             onChange={(e) => {
